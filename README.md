@@ -48,12 +48,7 @@ cd opencode-pro-setup
 powershell -ExecutionPolicy Bypass -File setup.ps1
 ```
 
-Or download and run directly:
-
-```powershell
-# One-liner (run as Administrator)
-powershell -Command "iwr -Uri 'https://raw.githubusercontent.com/FrancescoCastaldi/opencode-pro-setup/main/setup.ps1' -OutFile setup.ps1; ./setup.ps1"
-```
+> **Nota:** Il repo è privato. Scarica manualmente i file o clona con `git clone`.
 
 ### macOS / Linux
 
@@ -65,12 +60,7 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
-Or download and run directly:
-
-```bash
-# One-liner
-curl -fsSL https://raw.githubusercontent.com/FrancescoCastaldi/opencode-pro-setup/main/setup.sh | bash
-```
+> **Nota:** Il repo è privato. Scarica manualmente i file o clona con `git clone`.
 
 ## 📋 What the Installer Does
 
@@ -125,6 +115,7 @@ See [CUSTOMIZATION.md](docs/CUSTOMIZATION.md) for details.
 opencode-pro-setup/
 ├── setup.ps1          # Windows installer
 ├── setup.sh           # macOS/Linux installer
+├── ARCHITECTURE.md    # Architettura del progetto
 ├── config/
 │   ├── opencode.json           # Main configuration
 │   ├── .env.example            # API keys template
