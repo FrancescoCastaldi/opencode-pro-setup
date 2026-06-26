@@ -1,0 +1,52 @@
+{
+  // ============================================
+  // OpenCode Memory Plugin Configuration
+  // ============================================
+
+  // Storage location for vector database
+  "storagePath": "~/.opencode-mem/data",
+
+  "userEmailOverride": "",
+  "userNameOverride": "",
+
+  // Embedding Model (for similarity search)
+  "embeddingModel": "Xenova/nomic-embed-text-v1",
+
+  // Web Server Settings
+  "webServerEnabled": true,
+  "webServerPort": 4747,
+  "webServerHost": "127.0.0.1",
+
+  // Database Settings
+  "maxVectorsPerShard": 50000,
+  "autoCleanupEnabled": true,
+  "autoCleanupRetentionDays": 30,
+  "deduplicationEnabled": true,
+  "deduplicationSimilarityThreshold": 0.90,
+
+  // Memory Scope
+  "memory": {
+    "defaultScope": "project"
+  },
+
+  // Auto-Capture Settings (disabled by default - requires API key)
+  "autoCaptureEnabled": false,
+
+  // Search Settings
+  "similarityThreshold": 0.6,
+  "maxMemories": 10,
+
+  // User Profile
+  "injectProfile": true,
+  "userProfileAnalysisInterval": 10,
+  "userProfileMaxPreferences": 20,
+  "userProfileMaxPatterns": 15,
+  "userProfileMaxWorkflows": 10,
+  "userProfileConfidenceDecayDays": 30,
+  "userProfileChangelogRetentionCount": 5,
+
+  // Notifications
+  "showAutoCaptureToasts": false,
+  "showUserProfileToasts": true,
+  "showErrorToasts": true
+}

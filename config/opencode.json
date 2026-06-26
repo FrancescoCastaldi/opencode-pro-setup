@@ -1,0 +1,164 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "username": "${USERNAME}",
+  "model": "${MODEL:-opencode/deepseek-v4-flash-free}",
+  "small_model": "${SMALL_MODEL:-opencode/deepseek-v4-flash-free}",
+  "default_agent": "orchestrator",
+  "lsp": true,
+  "formatter": false,
+  "share": "manual",
+  "autoupdate": "notify",
+  "instructions": ["docs/plans/*.md"],
+  "plugin": [
+    "opencode-wakatime",
+    "opencode-mem",
+    "opencode-notify",
+    "opencode-worktree",
+    "envsitter-guard",
+    "@tarquinen/opencode-dcp",
+    "octto",
+    "@prevalentware/opencode-goal-plugin",
+    "opencode-conductor",
+    "micode",
+    "opencode-plugin-zooplankton",
+    "opencode-magi",
+    "@cortexkit/opencode-magic-context",
+    "opencode-subagent-statusline",
+    "opencode-neo",
+    "opencode-skills-collection",
+    "oh-my-opencode-slim"
+  ],
+  "mcp": {
+    "context7": {
+      "type": "local",
+      "command": ["npx", "-y", "@upstash/context7-mcp"]
+    },
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "-y", "@playwright/mcp"]
+    },
+    "fetch": {
+      "type": "local",
+      "command": ["npx", "-y", "mcp-fetch-server"]
+    },
+    "sequential-thinking": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "filesystem": {
+      "type": "local",
+      "command": [
+        "npx", "-y", "@modelcontextprotocol/server-filesystem",
+        "${HOME}/Documents",
+        "${HOME}/.config/opencode"
+      ]
+    },
+    "mermaid": {
+      "type": "local",
+      "command": ["npx", "-y", "mcp-mermaid"]
+    },
+    "excalidraw": {
+      "type": "local",
+      "command": ["npx", "-y", "mcp-excalidraw-server"]
+    },
+    "memory": {
+      "type": "local",
+      "command": [
+        "npx", "-y", "@modelcontextprotocol/server-memory",
+        "--memory-file", "${HOME}/.opencode/data/memories.json"
+      ]
+    },
+    "github": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      }
+    }
+  },
+  "permission": {
+    "*": "allow",
+    "edit": "allow",
+    "read": "allow",
+    "bash": {
+      "rm *": "deny",
+      "del *": "deny",
+      "Remove-Item *": "deny",
+      "Remove-Item -LiteralPath * -Recurse -Force": "deny",
+      "git push * --force*": "deny",
+      "git push * -f": "deny",
+      "git push * --force-with-lease": "allow",
+      "Set-Content * -Value *": "ask",
+      "Add-Content * -Value *": "ask",
+      "*": "allow"
+    },
+    "write": "allow",
+    "external_directory": {
+      "~/.ssh/**": "deny",
+      "~/.config/**": "ask",
+      "~/.aws/**": "deny",
+      "~/.azure/**": "deny",
+      "~/.gcp/**": "deny",
+      "~/.kube/**": "deny",
+      "${TEMP_DIR}": "allow",
+      "*": "allow"
+    }
+  },
+  "compaction": {
+    "auto": true,
+    "tail_turns": 35
+  },
+  "tool_output": {
+    "max_lines": 500,
+    "max_bytes": 64000
+  },
+  "experimental": {
+    "primary_tools": ["edit", "read", "glob", "grep"],
+    "mcp_timeout": 60000
+  },
+  "command": {
+    "test": {
+      "description": "Run project tests",
+      "template": "Run the project tests and report results"
+    },
+    "deploy": {
+      "description": "Deploy configuration",
+      "template": "Analyze changed files and deploy the configuration"
+    }
+  },
+  "tools": {
+    "websearch": true,
+    "codesearch": true
+  },
+  "agent": {
+    "orchestrator": {
+      "description": "Multi-agent orchestrator for complex workflows (plan->implement->review->merge)",
+      "mode": "primary",
+      "permission": {
+        "task": "allow",
+        "read": "allow",
+        "write": "allow",
+        "edit": "allow",
+        "bash": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "webfetch": "allow",
+        "websearch": "allow"
+      }
+    },
+    "general": {
+      "description": "General agent for tasks delegated by orchestrator",
+      "mode": "subagent",
+      "permission": {
+        "read": "allow",
+        "write": "allow",
+        "edit": "allow",
+        "bash": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "webfetch": "allow",
+        "websearch": "allow"
+      }
+    }
+  }
+}
