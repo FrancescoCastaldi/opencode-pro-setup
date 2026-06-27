@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     OpenCode PRO - Automated Setup for Windows
 .DESCRIPTION
@@ -293,8 +293,6 @@ if (Test-Path $configFile) {
     $tempDir = "$env:USERPROFILE\AppData\Local\Temp\opencode" -replace '\\', '\\'
     $content = $content -replace '\$\{TEMP_DIR\}', $tempDir
     
-    # Fix filesystem paths for Windows
-    $content = $content -replace '"C:\\\\Users', '"C:\\Users'
     
     Set-Content -Path $configFile -Value $content -Force
     Write-Ok "opencode.json configured with your values"
