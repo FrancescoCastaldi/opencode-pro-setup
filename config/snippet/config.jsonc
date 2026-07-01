@@ -1,0 +1,11 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JosXa/opencode-snippets/v2.2.3/schema/config.schema.json",
+  "logging": {
+    "debug": false
+  },
+  "experimental": {
+    "skillRendering": false,
+    "skillLoading": false
+  },
+  "injectRecencyMessages": 5
+}

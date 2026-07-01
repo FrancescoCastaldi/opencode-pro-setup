@@ -3,11 +3,11 @@
     OpenCode PRO - Automated Setup for Windows
 .DESCRIPTION
     Detects existing OpenCode installations, cleans them up, installs fresh,
-    and deploys the complete PRO configuration with plugins, MCPs, and agents.
-    Fully automated - just run and follow prompts.
+    and deploys the complete PRO configuration with plugins, custom plugins,
+    skills, MCPs, and agents. Fully cross-platform compatible.
 .NOTES
     Author: Francesco Castaldi
-    Version: 1.0.0
+    Version: 2.0.0
 #>
 
 param(
@@ -175,7 +175,6 @@ Write-Info "Installing opencode-ai via npm (global)..."
 npm install -g opencode-ai@latest 2>&1 | Out-Null
 if ($LASTEXITCODE -ne 0) {
     Write-Err "npm global install failed. Trying alternative..."
-    # Fallback: try npm install with --force
     npm install -g opencode-ai@latest --force 2>&1 | Out-Null
     if ($LASTEXITCODE -ne 0) {
         Write-Err "Installation failed. Try manually: npm install -g opencode-ai"
@@ -206,10 +205,13 @@ Write-Step "STEP 3/6 - Creating directory structure..."
 $configDir = "$env:USERPROFILE\.config\opencode"
 $opencodeDir = "$env:USERPROFILE\.opencode"
 $agentDir = "$configDir\agent"
+$pluginsDir = "$configDir\plugins"
+$snippetDir = "$configDir\snippet"
+$memoryDir = "$configDir\memory"
 $skillsDir = "$configDir\skills"
 $dataDir = "$opencodeDir\data"
 
-@($configDir, $opencodeDir, $agentDir, $skillsDir, $dataDir) | ForEach-Object {
+@($configDir, $opencodeDir, $agentDir, $pluginsDir, $snippetDir, $memoryDir, $skillsDir, $dataDir) | ForEach-Object {
     if (-not (Test-Path $_)) { New-Item -ItemType Directory -Path $_ -Force | Out-Null }
 }
 Write-Ok "Directories created"
@@ -239,23 +241,66 @@ if (-not (Test-Path $configSource)) {
 }
 
 if ($configSource -and (Test-Path $configSource)) {
-    # Copy all config files
-    Get-ChildItem -Path $configSource -Recurse -File | ForEach-Object {
-        $relative = $_.FullName.Substring($configSource.Length).TrimStart('\')
-        $dest = Join-Path $configDir $relative
-        $destDir = Split-Path $dest -Parent
-        if (-not (Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }
-        Copy-Item -Path $_.FullName -Destination $dest -Force
+    # Copy root config files (JSON, JSONC)
+    Get-ChildItem -Path $configSource -Filter "*.json*" -File | ForEach-Object {
+        Copy-Item -Path $_.FullName -Destination (Join-Path $configDir $_.Name) -Force
     }
+    # Copy .env.example
+    $envExample = Join-Path $configSource ".env.example"
+    if (Test-Path $envExample) { Copy-Item -Path $envExample -Destination $configDir -Force }
+
+    # Copy agent files
+    $agentSource = Join-Path $configSource "agent"
+    if (Test-Path $agentSource) {
+        Get-ChildItem -Path $agentSource -File | ForEach-Object {
+            Copy-Item -Path $_.FullName -Destination $agentDir -Force
+        }
+    }
+
+    # Copy custom plugins
+    $pluginsSource = Join-Path $configSource "plugins"
+    if (Test-Path $pluginsSource) {
+        Get-ChildItem -Path $pluginsSource -File | ForEach-Object {
+            Copy-Item -Path $_.FullName -Destination $pluginsDir -Force
+        }
+        Write-Ok "Custom plugins deployed"
+    }
+
+    # Copy snippet config
+    $snippetSource = Join-Path $configSource "snippet"
+    if (Test-Path $snippetSource) {
+        Get-ChildItem -Path $snippetSource -Recurse -File | ForEach-Object {
+            $relative = $_.FullName.Substring($snippetSource.Length).TrimStart('\')
+            $dest = Join-Path $snippetDir $relative
+            $destDir = Split-Path $dest -Parent
+            if (-not (Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }
+            Copy-Item -Path $_.FullName -Destination $dest -Force
+        }
+        Write-Ok "Snippet config deployed"
+    }
+
+    # Copy memory files
+    $memorySource = Join-Path $configSource "memory"
+    if (Test-Path $memorySource) {
+        Get-ChildItem -Path $memorySource -File | ForEach-Object {
+            Copy-Item -Path $_.FullName -Destination $memoryDir -Force
+        }
+        Write-Ok "Memory files deployed"
+    }
+
+    # Copy skills
+    $skillsSource = Join-Path $configSource "skills"
+    if (Test-Path $skillsSource) {
+        Copy-Item -Path "$skillsSource\*" -Destination $skillsDir -Recurse -Force
+        Write-Ok "Skills deployed"
+    }
+
     Write-Ok "Configuration files deployed"
 }
 
-# Deploy opencode.json with variable substitution
+# Deploy opencode.json with variable substitution (if needed)
 $configFile = Join-Path $configDir "opencode.json"
 if (Test-Path $configFile) {
-    $content = Get-Content $configFile -Raw
-    
-    # --- Interactive API Key Setup ---
     Write-Step "  -> API Key Configuration"
     
     # GitHub Token
@@ -263,14 +308,11 @@ if (Test-Path $configFile) {
     if (-not $envGithub) {
         $githubToken = Read-Host "Enter your GitHub Personal Access Token (or press Enter to skip)"
         if ($githubToken) {
-            $envGithub = $githubToken
-            # Save to .env
             $envContent = "GITHUB_TOKEN=$githubToken`n"
             Add-Content -Path "$configDir\.env" -Value $envContent -Force
             [Environment]::SetEnvironmentVariable("GITHUB_TOKEN", $githubToken, "User")
         }
     }
-    if ($envGithub) { $content = $content -replace '\$\{GITHUB_TOKEN\}', $envGithub }
     
     # Username
     $username = [Environment]::GetEnvironmentVariable("OPENCODE_USERNAME")
@@ -279,23 +321,8 @@ if (Test-Path $configFile) {
         $input_user = Read-Host "Enter OpenCode username (default: $defaultUser)"
         $username = if ($input_user) { $input_user } else { $defaultUser }
     }
-    $content = $content -replace '\$\{USERNAME\}', $username
-    
-    # Model (optional)
-    $content = $content -replace '\$\{MODEL:-opencode/deepseek-v4-flash-free\}', 'opencode/deepseek-v4-flash-free'
-    $content = $content -replace '\$\{SMALL_MODEL:-opencode/deepseek-v4-flash-free\}', 'opencode/deepseek-v4-flash-free'
-    
-    # HOME placeholder
-    $homeClean = $env:USERPROFILE -replace '\\', '\\'
-    $content = $content -replace '\$\{HOME\}', $homeClean
-    
-    # TEMP_DIR placeholder
-    $tempDir = "$env:USERPROFILE\AppData\Local\Temp\opencode" -replace '\\', '\\'
-    $content = $content -replace '\$\{TEMP_DIR\}', $tempDir
-    
-    
-    Set-Content -Path $configFile -Value $content -Force
-    Write-Ok "opencode.json configured with your values"
+
+    Write-Ok "Configuration ready (manual edits may be needed for provider settings)"
 }
 
 # ---------------------------
@@ -306,7 +333,17 @@ Write-Step "STEP 5/6 - Installing plugin dependencies..."
 # Create package.json if not exists
 $pkgFile = "$configDir\package.json"
 if (-not (Test-Path $pkgFile)) {
-    $pkg = @{ dependencies = @{ "@opencode-ai/plugin" = "latest" } } | ConvertTo-Json
+    $pkg = @{
+        dependencies = @{
+            "@opencode-ai/plugin" = "latest"
+            "opencode-snippets" = "latest"
+            "opencode-supermemory" = "latest"
+            "opencode-background-agents" = "latest"
+            "opencode-worktree" = "latest"
+            "opencode-notify" = "latest"
+            "oh-my-opencode-slim" = "latest"
+        }
+    } | ConvertTo-Json
     Set-Content -Path $pkgFile -Value $pkg -Force
 }
 
@@ -375,13 +412,24 @@ if (Test-Path "$configDir\agent\orchestrator.md") {
     Write-Ok "Agent: orchestrator"
 }
 
-# Check plugin deps
-if (Test-Path "$configDir\node_modules") {
-    Write-Ok "Plugins: node_modules present"
+# Check custom plugins
+@("context-pruning", "env-protection", "notification") | ForEach-Object {
+    if (Test-Path "$configDir\plugins\$_.js") {
+        Write-Ok "Plugin custom: $_.js"
+    }
 }
 
-# Check MCP servers availability (dry-run)
-$mcps = @("context7", "playwright", "fetch", "sequential-thinking", "filesystem", "mermaid", "excalidraw", "memory", "github")
+# Check skills
+$skillCount = @(Get-ChildItem -Path "$configDir\skills" -Directory).Count
+Write-Ok "Skills: $skillCount"
+
+# Check plugin deps
+if (Test-Path "$configDir\node_modules") {
+    Write-Ok "Plugin modules: node_modules present"
+}
+
+# Check MCP servers
+$mcps = @("context7", "gh_grep", "playwright")
 Write-Info "MCP servers configured: $($mcps -join ', ')"
 Write-Ok "All $($mcps.Count) MCP servers registered in config"
 
@@ -392,11 +440,9 @@ Write-Host "╠═════════════════════�
 Write-Host "║  Run:  opencode                                    ║" -ForegroundColor Cyan
 Write-Host "║  Docs: https://opencode.ai/docs                    ║" -ForegroundColor Cyan
 Write-Host "║                                                     ║" -ForegroundColor Green
-Write-Host "║  Your agents:                                       ║" -ForegroundColor Green
-Write-Host "║    - orchestrator (primary)                         ║" -ForegroundColor White
-Write-Host "║    - general (subagent)                             ║" -ForegroundColor White
-Write-Host "║                                                     ║" -ForegroundColor Green
-Write-Host "║  Plugins: 17  |  MCPs: 9                           ║" -ForegroundColor Yellow
+Write-Host "║  Agente: orchestrator (multi-agent)                 ║" -ForegroundColor Green
+Write-Host "║  Plugins: 6 ufficiali + 3 custom                    ║" -ForegroundColor Green
+Write-Host "║  MCPs: $($mcps.Count) | Skills: $skillCount                        ║" -ForegroundColor Green
 Write-Host "╚══════════════════════════════════════════════════════╝" -ForegroundColor Green
 Write-Host ""
 

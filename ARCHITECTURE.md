@@ -15,7 +15,7 @@ Questo repository contiene **setup automatizzati** per configurare un ambiente O
 | Config format | JSON + JSONC |
 | Agents | Markdown frontmatter |
 | Package manager | npm (globale) |
-| CI (futuro) | GitHub Actions |
+| Custom plugins | JavaScript (ES modules) |
 
 ---
 
@@ -29,17 +29,34 @@ opencode-pro-setup/
 ├── ARCHITECTURE.md            # Questo file
 ├── config/
 │   ├── opencode.json          # Config principale OpenCode
-│   ├── .env.example           # Template chiavi API
-│   ├── .gitignore             # Ignora node_modules, .env, backups
-│   ├── dcp.jsonc              # Dynamic Context Pruning
-│   ├── oh-my-opencode-slim.json # Skill collection plugin
+│   ├── oh-my-opencode-slim.json # Skill collection plugin presets
 │   ├── opencode-mem.jsonc     # Memoria persistente
+│   ├── dcp.jsonc              # Dynamic Context Pruning
+│   ├── tui.json               # TUI plugin config
+│   ├── package.json           # Dipendenze npm dei plugin
+│   ├── .env.example           # Template chiavi API
+│   ├── .gitignore
 │   ├── agent/
 │   │   └── orchestrator.md    # Agente orchestratore multi-agente
-│   └── skills/                # Skill personalizzate (future)
-├── docs/
-│   ├── API_KEYS.md            # Guida alle chiavi API
-│   └── CUSTOMIZATION.md       # Personalizzazione avanzata
+│   ├── plugins/               # Plugin custom JavaScript
+│   │   ├── context-pruning.js # Compressione contesto sessioni
+│   │   ├── env-protection.js  # Protezione file .env
+│   │   └── notification.js    # Notifiche cross-platform
+│   ├── snippet/
+│   │   └── config.jsonc       # Config snippet plugin
+│   ├── memory/
+│   │   ├── human.md           # Memoria utente
+│   │   └── persona.md         # Memoria persona
+│   └── skills/                # Skill OpenCode
+│       ├── deepwork/          # Workflow sessioni complesse
+│       ├── simplify/          # Semplificazione codice
+│       ├── codemap/           # Mappatura codebase
+│       ├── clonedeps/         # Clone dipendenze locali
+│       ├── reflect/           # Analisi pattern ricorrenti
+│       └── worktrees/         # Git worktree management
+└── docs/
+    ├── API_KEYS.md            # Guida alle chiavi API
+    └── CUSTOMIZATION.md       # Personalizzazione avanzata
 ```
 
 ---
@@ -48,44 +65,65 @@ opencode-pro-setup/
 
 ### 1. Installer Scripts
 
-| File | OS | Linguaggio | Lines |
-|------|----|------------|-------|
-| `setup.ps1` | Windows | PowerShell | 452 |
-| `setup.sh` | macOS/Linux | Bash | 288 |
+| File | OS | Linguaggio |
+|------|----|------------|
+| `setup.ps1` | Windows | PowerShell |
+| `setup.sh` | macOS/Linux | Bash |
 
-**Pipeline comune a entrambi:**
+**Pipeline comune:**
 
 ```
 ┌─────────────┐    ┌──────────┐    ┌───────────┐    ┌──────────┐    ┌──────────┐
-│ STEP 0      │ → │ STEP 1   │ → │ STEP 2    │ → │ STEP 3   │ → │ STEP 4   │
-│ Prerequisiti│   │ Scan &   │   │ Installa  │   │ Deploy    │   │ Verifica  │
-│ (node,git)  │   │ Clean    │   │ OpenCode  │   │ Config    │   │ & Report  │
+│ STEP 0      │ → │ STEP 1   │ → │ STEP 2    │ → │ STEP 4   │ → │ STEP 6   │
+│ Prerequisiti│   │ Scan &   │   │ Installa  │   │ Deploy   │   │ Verifica  │
+│ (node,git)  │   │ Clean    │   │ OpenCode  │   │ Config   │   │ & Report  │
 └─────────────┘   └──────────┘   └───────────┘   └──────────┘   └──────────┘
 ```
 
 ### 2. Config Layer (`config/`)
 
-- **`opencode.json`** — Cuore del sistema. 9 MCP server, 17 plugin, 2 agenti, permessi, comandi custom.
-- **Plugin configs** — `opencode-mem.jsonc` (memoria), `dcp.jsonc` (context pruning), `oh-my-opencode-slim.json` (skill collection).
+- **`opencode.json`** — Cuore del sistema: 3 MCP server, 6 plugin, agenti, permessi.
+- **Plugin configs** — `opencode-mem.jsonc` (memoria), `dcp.jsonc` (context pruning), `tui.json` (TUI plugin), `oh-my-opencode-slim.json` (skill collection).
+- **Custom plugins** — `plugins/` contiene plugin JavaScript per compressione contesto, protezione `.env`, e notifiche cross-platform.
 - **Agent definitions** — `agent/orchestrator.md` con frontmatter YAML per descrizione, modello, permessi.
 
-### 3. MCP Servers (9)
+### 3. MCP Servers (3)
 
-| Server | Scopo |
+| Server | Tipo | Scopo |
+|--------|------|-------|
+| `context7` | Remote | Documentazione live librerie |
+| `gh_grep` | Remote | Ricerca codice su GitHub |
+| `playwright` | Local | Automazione browser & testing |
+
+### 4. Plugin Ufficiali (6)
+
+| Plugin | Scopo |
 |--------|-------|
-| `context7` | Documentazione live librerie |
-| `playwright` | Automazione browser & testing |
-| `fetch` | Web fetching |
-| `sequential-thinking` | Ragionamento strutturato |
-| `filesystem` | Accesso file sicuro |
-| `mermaid` | Diagrammi e grafici |
-| `excalidraw` | Whiteboard e schizzi |
-| `memory` | Contesto persistente |
-| `github` | PR, issues, code search |
+| `opencode-snippets` | Gestione snippet |
+| `opencode-supermemory` | Memoria persistente con ricerca vettoriale |
+| `opencode-background-agents` | Esecuzione agenti in background |
+| `opencode-worktree` | Gestione Git worktree |
+| `opencode-notify` | Notifiche desktop |
+| `oh-my-opencode-slim` | Skill collection + agent presets |
 
-### 4. Plugins (17)
+### 5. Plugin Custom (3)
 
-Plugin inclusi: `opencode-mem`, `opencode-notify`, `opencode-worktree`, `opencode-goal`, `dcp`, `oh-my-opencode-slim`, `opencode-brainstorm`, `opencode-orchestrate`, e altri per automazione, qualità codice, orchestrazione.
+| Plugin | Scopo | Cross-Platform |
+|--------|-------|----------------|
+| `context-pruning.js` | Comprime contesto sessioni | ✅ |
+| `env-protection.js` | Blocca lettura `.env` | ✅ |
+| `notification.js` | Notifiche desktop native | ✅ macOS/Win/Linux |
+
+### 6. Skills (6)
+
+| Skill | Descrizione |
+|-------|-------------|
+| `deepwork` | Workflow orchestrator per sessioni complesse |
+| `simplify` | Semplificazione codice senza cambiar comportamento |
+| `codemap` | Generazione mappe codebase |
+| `clonedeps` | Clone dipendenze per ispezione |
+| `reflect` | Analisi pattern ricorrenti |
+| `worktrees` | Git worktree come lane isolate |
 
 ---
 
@@ -113,10 +151,10 @@ User avvia setup
 └────────┬────────┘
          │
          ▼
-┌─────────────────┐
-│ Deploy Config   │ ← Copia file, sostituisce placeholder,
-│ + API Keys      │   chiede GITHUB_TOKEN, GIT_USERNAME
-└────────┬────────┘
+┌─────────────────────────────────────────────┐
+│ Deploy Config + Plugin + Skills + Snippet   │
+│ + Memory + MCP + API Keys                   │
+└────────┬────────────────────────────────────┘
          │
          ▼
 ┌─────────────────┐
@@ -126,7 +164,7 @@ User avvia setup
          │
          ▼
 ┌─────────────────┐
-│ Verify & Report │ ← CLI version, config presente, agenti, plugins
+│ Verify & Report │ ← CLI version, config, agenti, plugins, skills
 └─────────────────┘
 ```
 
@@ -158,5 +196,5 @@ Nessun build step necessario. Il setup è "copia e incolla":
 - **Nessuna API key hardcoded** nei file — vengono chieste interattivamente o lette da `.env`
 - **Backup automatico** della config esistente prima di pulire
 - **Permessi granulari** in `opencode.json` per bash, filesystem, external directory
+- **Plugin env-protection.js** — Blocca la lettura di `.env` da parte dell'AI
 - **`.gitignore`** — Ignora node_modules, .env, file di backup
-- Il README originale puntava a un link pubblico `raw.githubusercontent.com` — aggiornato per repo privato

@@ -25,8 +25,8 @@ Edit the `plugin` array in `opencode.json`:
 ```json
 {
   "plugin": [
-    "opencode-mem",
-    "opencode-notify",
+    "opencode-snippets",
+    "opencode-supermemory",
     // Add plugin name here
   ]
 }
@@ -56,7 +56,33 @@ Edit the `mcp` object in `opencode.json`:
 }
 ```
 
-> **Warning:** Each MCP server adds context tokens. Too many will consume your context window.
+> Each MCP server adds context tokens. Too many will consume your context window.
+
+## Custom Plugins
+
+Custom plugins go in `~/.config/opencode/plugins/`:
+
+```javascript
+// my-plugin.js
+export const MyPlugin = async ({ $ }) => {
+  return {
+    "event": async ({ event }) => {
+      if (event.type === "session.start") {
+        console.log("Session started!")
+      }
+    },
+  }
+}
+```
+
+Reference them from `opencode.json` by adding to the `plugin` array:
+```json
+{
+  "plugin": [
+    "plugins/my-plugin.js"
+  ]
+}
+```
 
 ## Custom Agents
 
@@ -141,22 +167,14 @@ Place skill files in `~/.config/opencode/skills/`:
 
 ```bash
 # Add a custom skill
-cat > ~/.config/opencode/skills/my-workflow.md << 'EOF'
+mkdir -p ~/.config/opencode/skills/my-workflow
+cat > ~/.config/opencode/skills/my-workflow/SKILL.md << 'EOF'
 ---
 description: My custom workflow
 ---
 Follow these steps when...
 EOF
 ```
-
-## Memory Plugin Config
-
-Edit `~/.config/opencode/opencode-mem.jsonc`:
-
-- `storagePath` — Where memories are stored
-- `autoCaptureEnabled` — Enable/disable AI auto-capture
-- `similarityThreshold` — Memory search precision (0-1)
-- `maxMemories` — Max memories returned per search
 
 ## Troubleshooting
 
@@ -179,7 +197,7 @@ npx -y @server/name --help
 
 ### Reset everything
 ```bash
-# Backup your config first!
+# Backup first!
 cp -r ~/.config/opencode ~/opencode-backup
 
 # Remove and reinstall

@@ -226,6 +226,9 @@ ok "OpenCode v$OC_VERSION installed!"
 step "STEP 3/6 - Creating directory structure..."
 
 mkdir -p "$HOME/.config/opencode/agent"
+mkdir -p "$HOME/.config/opencode/plugins"
+mkdir -p "$HOME/.config/opencode/snippet"
+mkdir -p "$HOME/.config/opencode/memory"
 mkdir -p "$HOME/.config/opencode/skills"
 mkdir -p "$HOME/.opencode/data"
 
@@ -253,7 +256,37 @@ if [ ! -d "$CONFIG_SOURCE" ]; then
 fi
 
 if [ -d "$CONFIG_SOURCE" ]; then
-    cp -r "$CONFIG_SOURCE/"* "$HOME/.config/opencode/" 2>/dev/null
+    # Copy root config files
+    cp "$CONFIG_SOURCE"/*.json* "$HOME/.config/opencode/" 2>/dev/null || true
+    cp "$CONFIG_SOURCE"/.env.example "$HOME/.config/opencode/" 2>/dev/null || true
+
+    # Copy agent
+    cp -r "$CONFIG_SOURCE/agent/"* "$HOME/.config/opencode/agent/" 2>/dev/null || true
+
+    # Copy custom plugins
+    if [ -d "$CONFIG_SOURCE/plugins" ]; then
+        cp -r "$CONFIG_SOURCE/plugins/"* "$HOME/.config/opencode/plugins/" 2>/dev/null || true
+        ok "Custom plugins deployed"
+    fi
+
+    # Copy snippet config
+    if [ -d "$CONFIG_SOURCE/snippet" ]; then
+        cp -r "$CONFIG_SOURCE/snippet/"* "$HOME/.config/opencode/snippet/" 2>/dev/null || true
+        ok "Snippet config deployed"
+    fi
+
+    # Copy memory files
+    if [ -d "$CONFIG_SOURCE/memory" ]; then
+        cp -r "$CONFIG_SOURCE/memory/"* "$HOME/.config/opencode/memory/" 2>/dev/null || true
+        ok "Memory files deployed"
+    fi
+
+    # Copy skills
+    if [ -d "$CONFIG_SOURCE/skills" ]; then
+        cp -r "$CONFIG_SOURCE/skills/"* "$HOME/.config/opencode/skills/" 2>/dev/null || true
+        ok "Skills deployed"
+    fi
+
     ok "Configuration files deployed"
 fi
 
@@ -283,29 +316,7 @@ if [ -f "$CONFIG_FILE" ]; then
     read -p "Enter OpenCode username (default: $USERNAME): " INPUT_USER
     USERNAME="${INPUT_USER:-$USERNAME}"
 
-    # Apply substitutions
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        sed -i '' "s/\${USERNAME}/$USERNAME/g" "$CONFIG_FILE"
-        sed -i '' "s/\${GITHUB_TOKEN}/$GITHUB_TOKEN/g" "$CONFIG_FILE"
-        sed -i '' "s/\${HOME}/$HOME/g" "$CONFIG_FILE"
-        sed -i '' "s|\${TEMP_DIR}|/tmp/opencode|g" "$CONFIG_FILE"
-    else
-        sed -i "s/\${USERNAME}/$USERNAME/g" "$CONFIG_FILE"
-        sed -i "s/\${GITHUB_TOKEN}/$GITHUB_TOKEN/g" "$CONFIG_FILE"
-        sed -i "s|\${HOME}|$HOME|g" "$CONFIG_FILE"
-        sed -i "s|\${TEMP_DIR}|/tmp/opencode|g" "$CONFIG_FILE"
-    fi
-
-    # Replace default model placeholders
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        sed -i '' 's/\${MODEL:-opencode\/deepseek-v4-flash-free}/opencode\/deepseek-v4-flash-free/g' "$CONFIG_FILE"
-        sed -i '' 's/\${SMALL_MODEL:-opencode\/deepseek-v4-flash-free}/opencode\/deepseek-v4-flash-free/g' "$CONFIG_FILE"
-    else
-        sed -i 's/\${MODEL:-opencode\/deepseek-v4-flash-free}/opencode\/deepseek-v4-flash-free/g' "$CONFIG_FILE"
-        sed -i 's/\${SMALL_MODEL:-opencode\/deepseek-v4-flash-free}/opencode\/deepseek-v4-flash-free/g' "$CONFIG_FILE"
-    fi
-
-    ok "opencode.json configured with your values"
+    ok "Configuration ready (manual edits may be needed for provider settings)"
 fi
 
 # ---------------------------------------------------------
@@ -318,7 +329,13 @@ if [ ! -f "$HOME/.config/opencode/package.json" ]; then
     cat > "$HOME/.config/opencode/package.json" << 'EOF'
 {
   "dependencies": {
-    "@opencode-ai/plugin": "latest"
+    "@opencode-ai/plugin": "latest",
+    "opencode-snippets": "latest",
+    "opencode-supermemory": "latest",
+    "opencode-background-agents": "latest",
+    "opencode-worktree": "latest",
+    "opencode-notify": "latest",
+    "oh-my-opencode-slim": "latest"
   }
 }
 EOF
@@ -328,7 +345,7 @@ fi
 cd "$HOME/.config/opencode"
 npm install --no-fund --no-audit 2>&1 || warn "npm install completed with warnings"
 
-# Create .opencode/package.json
+# Create .opencode/package.json (for runtime deps)
 if [ ! -f "$HOME/.opencode/package.json" ]; then
     cat > "$HOME/.opencode/package.json" << 'EOF'
 {
@@ -374,13 +391,30 @@ if [ -f "$HOME/.config/opencode/agent/orchestrator.md" ]; then
     ok "Agent: orchestrator"
 fi
 
+# Custom plugins
+for plugin in context-pruning env-protection notification; do
+    if [ -f "$HOME/.config/opencode/plugins/$plugin.js" ]; then
+        ok "Plugin custom: $plugin.js"
+    fi
+done
+
+# Skills
+SKILL_COUNT=0
+for skill_dir in "$HOME/.config/opencode/skills/"*/; do
+    if [ -d "$skill_dir" ]; then
+        SKILL_COUNT=$((SKILL_COUNT + 1))
+    fi
+done
+ok "Skills: $SKILL_COUNT"
+
 # Plugins
 if [ -d "$HOME/.config/opencode/node_modules" ]; then
-    ok "Plugins: node_modules present"
+    PLUGIN_COUNT=$(ls -1 "$HOME/.config/opencode/node_modules/opencode-"* 2>/dev/null | wc -l | tr -d ' ')
+    ok "Plugin modules: $PLUGIN_COUNT installed"
 fi
 
 # MCPs
-MCPS=("context7" "playwright" "fetch" "sequential-thinking" "filesystem" "mermaid" "excalidraw" "memory" "github")
+MCPS=("context7" "gh_grep" "playwright")
 echo -e "  ${CYAN}MCP servers configured:${NC} ${MCPS[*]}"
 echo -e "  ${GREEN}All ${#MCPS[@]} MCP servers registered in config${NC}"
 
@@ -391,11 +425,9 @@ echo -e "${GREEN}╠════════════════════
 echo -e "${CYAN}║  Run:  opencode                                    ║${NC}"
 echo -e "${CYAN}║  Docs: https://opencode.ai/docs                    ║${NC}"
 echo -e "${GREEN}║                                                     ║${NC}"
-echo -e "${GREEN}║  Your agents:                                       ║${NC}"
-echo -e "${WHITE}║    - orchestrator (primary)                         ║${NC}"
-echo -e "${WHITE}║    - general (subagent)                             ║${NC}"
-echo -e "${GREEN}║                                                     ║${NC}"
-echo -e "${YELLOW}║  Plugins: 17  |  MCPs: 9                           ║${NC}"
+echo -e "${GREEN}║  Agente: orchestrator (multi-agent)                 ║${NC}"
+echo -e "${GREEN}║  Plugins: 6 ufficiali + 3 custom                    ║${NC}"
+echo -e "${GREEN}║  MCPs: ${#MCPS[@]} | Skills: ${SKILL_COUNT}                      ║${NC}"
 echo -e "${GREEN}╚══════════════════════════════════════════════════════╝${NC}"
 echo ""
 

@@ -5,15 +5,15 @@
 ### GitHub Token
 - **Env var:** `GITHUB_TOKEN`
 - **Create at:** https://github.com/settings/tokens
-- **Required scopes:** `repo`, `read:user`, `read:org`
-- **Used by:** GitHub MCP server (PRs, issues, code search)
+- **Required scopes:** `repo`, `read:user`
+- **Used by:** gh_grep MCP server (code search)
 
 ## Optional
 
 ### Anthropic
 - **Env var:** `ANTHROPIC_API_KEY`
 - **Get at:** https://console.anthropic.com
-- **Used for:** Claude models (Sonnet, Haiku)
+- **Used for:** Claude models
 - **Config via:** `opencode providers add anthropic`
 
 ### OpenAI
@@ -28,21 +28,12 @@
 - **Used for:** Gemini models
 - **Config via:** `opencode providers add google`
 
-### Local Models (Ollama)
-```bash
-# Install Ollama
-curl -fsSL https://ollama.ai/install.sh | sh
-# Pull a model
-ollama pull codellama
-# Configure in OpenCode
-opencode providers add ollama
-```
+## Auto-Capture Memory (opencode-supermemory)
 
-## Auto-Capture Memory (opencode-mem)
 For AI-powered auto-capture of memories:
-- `MEMORY_API_KEY` — API key for the LLM provider
-- `MEMORY_MODEL` — Model (e.g., `gpt-4o-mini`)
-- `MEMORY_API_URL` — API endpoint URL
+- Configure provider in `opencode-mem.jsonc`
+- Uses `opencodeProvider` + `opencodeModel` to reuse OpenCode auth
+- Or set `memoryApiKey`, `memoryModel`, `memoryApiUrl` manually
 
 ## How to Set API Keys
 
@@ -59,13 +50,7 @@ echo 'export GITHUB_TOKEN="ghp_..."' >> ~/.zshrc
 source ~/.zshrc
 ```
 
-### Method 3: .env File
-```bash
-echo "GITHUB_TOKEN=ghp_..." > ~/.config/opencode/.env
-```
-
-### Method 4: OpenCode CLI
+### Method 3: OpenCode CLI
 ```bash
 opencode providers add anthropic  # Interactive
-opencode mcp auth github          # OAuth flow
 ```
