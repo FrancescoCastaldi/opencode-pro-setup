@@ -277,7 +277,7 @@
     },
     "fetch": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-fetch"],
+      "command": ["npx", "-y", "html-extractor-mcp"],
       "enabled": true
     },
 
@@ -399,3 +399,4 @@
     "tail_turns": 15
   }
 }
+
