@@ -1,0 +1,401 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "username": "FrancescoCastaldi",
+
+  // ==========================================
+  // DEFAULT AGENT & MODELLI
+  // ==========================================
+  "default_agent": "orchestrator",
+  "model": "opencode/deepseek-v4-flash-free",  // Modello predefinito
+  // "small_model": "opencode-go/*",      // modello per tasks semplici
+
+  // ==========================================
+  // SKILLS — percorsi per SKILL.md
+  // ==========================================
+  "skills": {
+    "paths": [
+      "~/.agents/skills",
+      "~/.config/opencode/skills"
+    ]
+  },
+
+  // ==========================================
+  // REFERENCES — documentazione esterna
+  // ==========================================
+  "references": {
+    "react": {
+      "repository": "facebook/react",
+      "branch": "main",
+      "description": "Use for React core implementation details and source code"
+    },
+    "nextjs": {
+      "repository": "vercel/next.js",
+      "branch": "canary",
+      "description": "Use for Next.js implementation details and API reference"
+    },
+    "typescript": {
+      "repository": "microsoft/TypeScript",
+      "branch": "main",
+      "description": "Use for TypeScript compiler and type system reference"
+    }
+  },
+
+  // ==========================================
+  // AGENTS — definizione agenti
+  // ==========================================
+  "agent": {
+    // Configurazioni speciali
+    "title": {
+      "model": "opencode/deepseek-v4-flash-free"
+    },
+    "summary": {
+      "model": "opencode/deepseek-v4-flash-free"
+    },
+    // --- Agent PRINCIPALI (built-in overrides) ---
+    "orchestrator": {
+      "description": "Orchestrator che coordina agenti specializzati in parallelo per workflow complessi",
+      "mode": "primary",
+      "color": "#4ade80",
+      "prompt": "{file:~/.config/opencode/agents/orchestrator.md}",
+      "permission": {
+        "read": "allow",
+        "edit": "allow",
+        "write": "allow",
+        "bash": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "webfetch": "allow",
+        "websearch": "allow",
+        "task": "allow",
+        "todowrite": "allow"
+      }
+    },
+    "general": {
+      "description": "Agente general-purpose per implementazione, refactoring e bug fix",
+      "mode": "primary",
+      "color": "#60a5fa",
+      "prompt": "{file:~/.config/opencode/agents/general.md}",
+      "permission": {
+        "read": "allow", "edit": "allow", "write": "allow", "bash": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow"
+      }
+    },
+    "explore": {
+      "description": "Agente rapido per esplorazione e analisi del codice",
+      "mode": "primary",
+      "color": "#f59e0b",
+      "prompt": "{file:~/.config/opencode/agents/explore.md}",
+      "permission": {
+        "read": "allow", "edit": "deny", "write": "deny",
+        "bash": "allow", "glob": "allow", "grep": "allow",
+        "webfetch": "allow", "websearch": "allow", "task": "allow"
+      }
+    },
+    "brainstormer": {
+      "description": "Agente creativo per ideazione, naming, UX e problemi aperti",
+      "mode": "primary",
+      "color": "#a855f7",
+      "temperature": 0.8,
+      "prompt": "{file:~/.config/opencode/agents/brainstormer.md}",
+      "permission": {
+        "read": "allow", "edit": "deny", "write": "deny", "bash": "deny",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow"
+      }
+    },
+    "build": {
+      "description": "Agente di implementazione diretta con accesso completo agli strumenti",
+      "mode": "primary",
+      "color": "#34d399",
+      "prompt": "{file:~/.config/opencode/agents/build.md}",
+      "permission": {
+        "read": "allow", "edit": "allow", "write": "allow", "bash": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow"
+      }
+    },
+
+    // --- Agent SPECIALIZZATI (subagent) ---
+    "reviewer": {
+      "description": "Revisore del codice — analisi qualità, sicurezza e best practices",
+      "mode": "subagent",
+      "color": "#f43f5e",
+      "prompt": "{file:~/.config/opencode/agents/reviewer.md}",
+      "permission": {
+        "read": "allow", "edit": "deny", "write": "deny",
+        "bash": "allow", "glob": "allow", "grep": "allow",
+        "webfetch": "allow", "websearch": "allow", "task": "allow"
+      }
+    },
+    "debugger": {
+      "description": "Agente specializzato in debugging — trova e risolve bug",
+      "mode": "subagent",
+      "color": "#ef4444",
+      "prompt": "{file:~/.config/opencode/agents/debugger.md}",
+      "permission": {
+        "read": "allow", "edit": "allow", "write": "allow", "bash": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow"
+      }
+    },
+    "optimizer": {
+      "description": "Agente di ottimizzazione performance — codice + infrastruttura",
+      "mode": "subagent",
+      "color": "#10b981",
+      "prompt": "{file:~/.config/opencode/agents/optimizer.md}",
+      "permission": {
+        "read": "allow", "edit": "allow", "write": "allow", "bash": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow"
+      }
+    },
+    "tester": {
+      "description": "Agente di test — scrive, esegue e mantiene test",
+      "mode": "subagent",
+      "color": "#8b5cf6",
+      "prompt": "{file:~/.config/opencode/agents/tester.md}",
+      "permission": {
+        "read": "allow", "edit": "allow", "write": "allow", "bash": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow"
+      }
+    },
+    "docker": {
+      "description": "Agente DevOps/Docker — container, compose, CI/CD, deploy",
+      "mode": "subagent",
+      "color": "#0ea5e9",
+      "prompt": "{file:~/.config/opencode/agents/docker.md}",
+      "permission": {
+        "read": "allow", "edit": "allow", "write": "allow", "bash": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow"
+      }
+    },
+    "database": {
+      "description": "Agente database — SQL, SQLite, PostgreSQL, ottimizzazione query",
+      "mode": "subagent",
+      "color": "#14b8a6",
+      "prompt": "{file:~/.config/opencode/agents/database.md}",
+      "permission": {
+        "read": "allow", "edit": "allow", "write": "allow", "bash": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow"
+      }
+    },
+    "refactor": {
+      "description": "Agente di refactoring — ristruttura codice senza cambiarne il comportamento",
+      "mode": "subagent",
+      "color": "#f97316",
+      "prompt": "{file:~/.config/opencode/agents/refactor.md}",
+      "permission": {
+        "read": "allow", "edit": "allow", "write": "allow", "bash": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow"
+      }
+    },
+    "scriptwriter": {
+      "description": "Agente per scripting — PowerShell, bash, Python automation",
+      "mode": "subagent",
+      "color": "#eab308",
+      "prompt": "{file:~/.config/opencode/agents/scriptwriter.md}",
+      "permission": {
+        "read": "allow", "edit": "allow", "write": "allow", "bash": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow"
+      }
+    }
+  },
+
+  // ==========================================
+  // MCP SERVERS — 15+ server per ogni evenienza
+  // ==========================================
+  "mcp": {
+    // --- Server già esistenti ---
+    "filesystem": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-filesystem", "C:\\Users\\franc"],
+      "enabled": true
+    },
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "-y", "@playwright/mcp@latest"],
+      "enabled": true
+    },
+    "github": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
+      "enabled": true,
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "{file:~/.config/opencode/.github-token}"
+      }
+    },
+    "puppeteer": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-puppeteer"],
+      "enabled": true
+    },
+    "excel": {
+      "type": "local",
+      "command": ["cmd", "/c", "npx", "--yes", "@negokaz/excel-mcp-server"],
+      "enabled": true,
+      "env": {
+        "EXCEL_MCP_PAGING_CELLS_LIMIT": "4000"
+      }
+    },
+    "opencode": {
+      "type": "local",
+      "command": ["npx", "-y", "opencode-mcp"],
+      "enabled": true
+    },
+
+    // --- Server NUOVI: Database & Storage ---
+    "sqlite": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-sqlite", "C:\\Users\\franc\\data\\sqlite.db"],
+      "enabled": false
+    },
+    "postgres": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-postgres", "postgresql://localhost/mydb"],
+      "enabled": false
+    },
+    "redis": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-redis", "redis://localhost:6379"],
+      "enabled": false
+    },
+
+    // --- Server NUOVI: Web & Search ---
+    "brave-search": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-brave-search"],
+      "enabled": false,
+      "env": {
+        "BRAVE_API_KEY": "{env:BRAVE_API_KEY}"
+      }
+    },
+    "fetch": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-fetch"],
+      "enabled": true
+    },
+
+    // --- Server NUOVI: AI & Reasoning ---
+    "sequential-thinking": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "enabled": true
+    },
+    "memory": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-memory"],
+      "enabled": true
+    },
+    "mcp-ops": {
+      "type": "local",
+      "command": ["npx", "-y", "mcp-ops"],
+      "enabled": false
+    },
+
+    // --- Server PRO: contesto & ricerca ---
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true
+    },
+    "gh_grep": {
+      "type": "remote",
+      "url": "https://mcp.grep.app",
+      "enabled": true
+    }
+  },
+
+  // ==========================================
+  // LSP SERVERS — Language support
+  // ==========================================
+  "lsp": {
+    "typescript": {
+      "command": ["C:\\Users\\franc\\AppData\\Roaming\\npm\\typescript-language-server.cmd", "--stdio"],
+      "extensions": [".ts", ".tsx", ".mts", ".cts"]
+    },
+    "javascript": {
+      "command": ["C:\\Users\\franc\\AppData\\Roaming\\npm\\typescript-language-server.cmd", "--stdio"],
+      "extensions": [".js", ".jsx", ".mjs", ".cjs"]
+    },
+    "html": {
+      "command": ["C:\\Users\\franc\\AppData\\Roaming\\npm\\vscode-html-language-server.cmd", "--stdio"],
+      "extensions": [".html", ".htm"]
+    },
+    "css": {
+      "command": ["C:\\Users\\franc\\AppData\\Roaming\\npm\\vscode-css-language-server.cmd", "--stdio"],
+      "extensions": [".css", ".scss", ".less", ".sass"]
+    },
+    "json": {
+      "command": ["C:\\Users\\franc\\AppData\\Roaming\\npm\\vscode-json-language-server.cmd", "--stdio"],
+      "extensions": [".json", ".jsonc", ".json5"]
+    },
+    "markdown": {
+      "command": ["C:\\Users\\franc\\AppData\\Roaming\\npm\\vscode-markdown-language-server.cmd", "--stdio"],
+      "extensions": [".md", ".mdx"]
+    },
+    "latex": {
+      "command": ["C:\\Users\\franc\\scoop\\shims\\texlab"],
+      "extensions": [".tex", ".sty", ".cls", ".bib"]
+    },
+    "python": {
+      "command": ["C:\\Users\\franc\\AppData\\Roaming\\npm\\pyright.cmd", "--stdio"],
+      "extensions": [".py"],
+      "enabled": false
+    },
+    "docker": {
+      "command": ["C:\\Users\\franc\\AppData\\Roaming\\npm\\dockerfile-language-server-nodejs.cmd", "--stdio"],
+      "extensions": ["Dockerfile", ".dockerfile"],
+      "enabled": false
+    },
+    "yaml": {
+      "command": ["C:\\Users\\franc\\AppData\\Roaming\\npm\\yaml-language-server.cmd", "--stdio"],
+      "extensions": [".yaml", ".yml"],
+      "enabled": false
+    }
+  },
+
+  // ==========================================
+  // PLUGINS
+  // ==========================================
+  "plugin": [
+    "opencode-mem",
+    "opencode-snippets",
+    "opencode-supermemory",
+    "opencode-background-agents",
+    "opencode-worktree",
+    "opencode-notify",
+    "oh-my-opencode-slim"
+  ],
+
+  // ==========================================
+  // PERMESSI GLOBALI
+  // ==========================================
+  "permission": {
+    "read": "allow",
+    "edit": "allow",
+    "glob": "allow",
+    "grep": "allow",
+    "bash": "allow",
+    "task": "allow",
+    "todowrite": "allow",
+    "webfetch": "allow",
+    "websearch": "allow",
+    "skill": "allow",
+    "question": "allow",
+    "external_directory": "allow"
+  },
+
+  // ==========================================
+  // COMPORTAMENTO
+  // ==========================================
+  "compaction": {
+    "auto": true,
+    "tail_turns": 15
+  }
+}
