@@ -209,21 +209,18 @@
   // MCP SERVERS â€” 15+ server per ogni evenienza
   // ==========================================
   "mcp": {
-    // --- Server giÃ  esistenti ---
-    "filesystem": {
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-filesystem", "C:\\Users\\franc"],
-      "enabled": true
-    },
+    // --- Server core ---
     "playwright": {
       "type": "local",
-      "command": ["npx", "-y", "@playwright/mcp@latest"],
-      "enabled": true
+      "command": ["npx", "-y", "@playwright/mcp"],
+      "enabled": true,
+      "timeout": 30000
     },
     "github": {
       "type": "local",
       "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
       "enabled": true,
+      "timeout": 30000,
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "{file:~/.config/opencode/.github-token}"
       }
@@ -231,12 +228,14 @@
     "puppeteer": {
       "type": "local",
       "command": ["npx", "-y", "@modelcontextprotocol/server-puppeteer"],
-      "enabled": true
+      "enabled": false,
+      "description": "Disabilitato - playwright giÃ  copre browser automation"
     },
     "excel": {
       "type": "local",
-      "command": ["cmd", "/c", "npx", "--yes", "@negokaz/excel-mcp-server"],
+      "command": ["npx", "-y", "@negokaz/excel-mcp-server"],
       "enabled": true,
+      "timeout": 30000,
       "env": {
         "EXCEL_MCP_PAGING_CELLS_LIMIT": "4000"
       }
@@ -244,15 +243,11 @@
     "opencode": {
       "type": "local",
       "command": ["npx", "-y", "opencode-mcp"],
-      "enabled": true
+      "enabled": true,
+      "timeout": 30000
     },
 
     // --- Server NUOVI: Database & Storage ---
-    "sqlite": {
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-sqlite", "C:\\Users\\franc\\data\\sqlite.db"],
-      "enabled": false
-    },
     "postgres": {
       "type": "local",
       "command": ["npx", "-y", "@modelcontextprotocol/server-postgres", "postgresql://localhost/mydb"],
@@ -265,30 +260,25 @@
     },
 
     // --- Server NUOVI: Web & Search ---
-    "brave-search": {
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-brave-search"],
-      "enabled": false,
-      "env": {
-        "BRAVE_API_KEY": "{env:BRAVE_API_KEY}"
-      }
-    },
     "fetch": {
       "type": "local",
-      "command": ["npx", "-y", "html-extractor-mcp"],
-      "enabled": true
+      "command": ["npx", "-y", "mcp-fetch-server"],
+      "enabled": true,
+      "timeout": 30000
     },
 
     // --- Server NUOVI: AI & Reasoning ---
     "sequential-thinking": {
       "type": "local",
       "command": ["npx", "-y", "@modelcontextprotocol/server-sequential-thinking"],
-      "enabled": true
+      "enabled": true,
+      "timeout": 30000
     },
     "memory": {
       "type": "local",
       "command": ["npx", "-y", "@modelcontextprotocol/server-memory"],
-      "enabled": true
+      "enabled": true,
+      "timeout": 30000
     },
     "mcp-ops": {
       "type": "local",
@@ -314,45 +304,45 @@
   // ==========================================
   "lsp": {
     "typescript": {
-      "command": ["C:\\Users\\franc\\AppData\\Roaming\\npm\\typescript-language-server.cmd", "--stdio"],
+      "command": ["typescript-language-server", "--stdio"],
       "extensions": [".ts", ".tsx", ".mts", ".cts"]
     },
     "javascript": {
-      "command": ["C:\\Users\\franc\\AppData\\Roaming\\npm\\typescript-language-server.cmd", "--stdio"],
+      "command": ["typescript-language-server", "--stdio"],
       "extensions": [".js", ".jsx", ".mjs", ".cjs"]
     },
     "html": {
-      "command": ["C:\\Users\\franc\\AppData\\Roaming\\npm\\vscode-html-language-server.cmd", "--stdio"],
+      "command": ["vscode-html-language-server", "--stdio"],
       "extensions": [".html", ".htm"]
     },
     "css": {
-      "command": ["C:\\Users\\franc\\AppData\\Roaming\\npm\\vscode-css-language-server.cmd", "--stdio"],
+      "command": ["vscode-css-language-server", "--stdio"],
       "extensions": [".css", ".scss", ".less", ".sass"]
     },
     "json": {
-      "command": ["C:\\Users\\franc\\AppData\\Roaming\\npm\\vscode-json-language-server.cmd", "--stdio"],
+      "command": ["vscode-json-language-server", "--stdio"],
       "extensions": [".json", ".jsonc", ".json5"]
     },
     "markdown": {
-      "command": ["C:\\Users\\franc\\AppData\\Roaming\\npm\\vscode-markdown-language-server.cmd", "--stdio"],
+      "command": ["vscode-markdown-language-server", "--stdio"],
       "extensions": [".md", ".mdx"]
     },
     "latex": {
-      "command": ["C:\\Users\\franc\\scoop\\shims\\texlab"],
+      "command": ["texlab"],
       "extensions": [".tex", ".sty", ".cls", ".bib"]
     },
     "python": {
-      "command": ["C:\\Users\\franc\\AppData\\Roaming\\npm\\pyright.cmd", "--stdio"],
+      "command": ["pyright-langserver", "--stdio"],
       "extensions": [".py"],
       "enabled": false
     },
     "docker": {
-      "command": ["C:\\Users\\franc\\AppData\\Roaming\\npm\\dockerfile-language-server-nodejs.cmd", "--stdio"],
+      "command": ["dockerfile-language-server-nodejs", "--stdio"],
       "extensions": ["Dockerfile", ".dockerfile"],
       "enabled": false
     },
     "yaml": {
-      "command": ["C:\\Users\\franc\\AppData\\Roaming\\npm\\yaml-language-server.cmd", "--stdio"],
+      "command": ["yaml-language-server", "--stdio"],
       "extensions": [".yaml", ".yml"],
       "enabled": false
     }

@@ -543,7 +543,76 @@ bun.lock
 }
 
 # ============================================================
-# STEP 5b: CONFIGURE API KEYS
+# STEP 5b: INSTALL MCP SERVER & LSP DEPENDENCIES
+# ============================================================
+function Step-InstallMCPServers {
+    Write-Step "STEP 5b/8 - Installing MCP Server & LSP packages..."
+    Show-ProgressBar -Percent 87 -Label "Installing MCP & LSP packages"
+
+    Write-Info "Installing MCP Server packages globally..."
+    
+    $mcpPackages = @(
+        "@playwright/mcp",
+        "@modelcontextprotocol/server-github",
+        "@negokaz/excel-mcp-server",
+        "opencode-mcp",
+        "mcp-fetch-server",
+        "@modelcontextprotocol/server-sequential-thinking",
+        "@modelcontextprotocol/server-memory"
+    )
+
+    foreach ($pkg in $mcpPackages) {
+        Write-Info "  Installing $pkg..."
+        $result = npm install -g $pkg 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            Write-Ok "  $pkg installed"
+        } else {
+            Write-Warn "  $pkg had issues, retrying..."
+            $result = npm install -g $pkg --force 2>&1
+            if ($LASTEXITCODE -eq 0) {
+                Write-Ok "  $pkg installed (with --force)"
+            } else {
+                Write-Warn "  $pkg failed: $_"
+            }
+        }
+    }
+
+    Write-Info "Installing LSP Server packages globally..."
+    
+    $lspPackages = @(
+        "typescript-language-server",
+        "vscode-html-language-server",
+        "vscode-css-language-server",
+        "vscode-json-language-server",
+        "vscode-markdown-language-server",
+        "yaml-language-server"
+    )
+
+    foreach ($pkg in $lspPackages) {
+        Write-Info "  Installing $pkg..."
+        $result = npm install -g $pkg 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            Write-Ok "  $pkg installed"
+        } else {
+            Write-Warn "  $pkg had issues: $_"
+        }
+    }
+
+    # Install Playwright browser for @playwright/mcp
+    Write-Info "Installing Playwright Chromium browser..."
+    $playwrightResult = npx -p @playwright/mcp playwright install chromium 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        Write-Ok "Playwright Chromium browser installed"
+    } else {
+        Write-Warn "Playwright browser install had issues (will be auto-downloaded on first use)"
+    }
+
+    Show-ProgressBar -Percent 90 -Label "MCP & LSP installed"
+    Write-Ok "All MCP Server and LSP dependencies installed!"
+}
+
+# ============================================================
+# STEP 5c: CONFIGURE API KEYS
 # ============================================================
 function Step-ConfigureAPI {
     Write-Step "  -> API Key Configuration"
@@ -662,7 +731,8 @@ function Step-Verify {
     Write-Host "    - 6 Official plugins" -ForegroundColor Cyan
     Write-Host "    - 3 Custom plugins (context-pruning, env-protection, notification)" -ForegroundColor Cyan
     Write-Host "    - 6 Skills (deepwork, simplify, codemap, clonedeps, reflect, worktrees)" -ForegroundColor Cyan
-    Write-Host "    - 3 MCP servers (context7, gh_grep, playwright)" -ForegroundColor Cyan
+    Write-Host "    - 11 MCP servers (playwright, github, excel, opencode, fetch, sequential-thinking, memory, context7, gh_grep, websearch)" -ForegroundColor Cyan
+    Write-Host "    - 6 LSP servers (TypeScript, HTML, CSS, JSON, Markdown, YAML)" -ForegroundColor Cyan
     Write-Host "    - Orchestrator agent with sub-agents" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "    Backup saved to: $BACKUP_DIR" -ForegroundColor Yellow
@@ -692,6 +762,7 @@ try {
     Step-CreateDirectories
     Step-DeployConfiguration
     Step-InstallDependencies
+    Step-InstallMCPServers
     Step-ConfigureAPI
     Step-Verify
 
