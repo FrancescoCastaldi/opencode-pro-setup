@@ -10,17 +10,15 @@
   // "small_model": "opencode-go/*",      // modello per tasks semplici
 
   // ==========================================
-  // SKILLS — percorsi per SKILL.md
+  // SKILLS â€” percorsi per SKILL.md
   // ==========================================
   "skills": {
-    "paths": [
-      "~/.agents/skills",
-      "~/.config/opencode/skills"
+    "paths": ["~/.config/opencode/skills"
     ]
   },
 
   // ==========================================
-  // REFERENCES — documentazione esterna
+  // REFERENCES â€” documentazione esterna
   // ==========================================
   "references": {
     "react": {
@@ -41,7 +39,7 @@
   },
 
   // ==========================================
-  // AGENTS — definizione agenti
+  // AGENTS â€” definizione agenti
   // ==========================================
   "agent": {
     // Configurazioni speciali
@@ -56,7 +54,7 @@
       "description": "Orchestrator che coordina agenti specializzati in parallelo per workflow complessi",
       "mode": "primary",
       "color": "#4ade80",
-      "prompt": "{file:~/.config/opencode/agents/orchestrator.md}",
+      "prompt": "{file:~/.config/opencode/agent/orchestrator.md}",
       "permission": {
         "read": "allow",
         "edit": "allow",
@@ -74,7 +72,7 @@
       "description": "Agente general-purpose per implementazione, refactoring e bug fix",
       "mode": "primary",
       "color": "#60a5fa",
-      "prompt": "{file:~/.config/opencode/agents/general.md}",
+      "prompt": "{file:~/.config/opencode/agent/general.md}",
       "permission": {
         "read": "allow", "edit": "allow", "write": "allow", "bash": "allow",
         "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
@@ -85,7 +83,7 @@
       "description": "Agente rapido per esplorazione e analisi del codice",
       "mode": "primary",
       "color": "#f59e0b",
-      "prompt": "{file:~/.config/opencode/agents/explore.md}",
+      "prompt": "{file:~/.config/opencode/agent/explore.md}",
       "permission": {
         "read": "allow", "edit": "deny", "write": "deny",
         "bash": "allow", "glob": "allow", "grep": "allow",
@@ -97,7 +95,7 @@
       "mode": "primary",
       "color": "#a855f7",
       "temperature": 0.8,
-      "prompt": "{file:~/.config/opencode/agents/brainstormer.md}",
+      "prompt": "{file:~/.config/opencode/agent/brainstormer.md}",
       "permission": {
         "read": "allow", "edit": "deny", "write": "deny", "bash": "deny",
         "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
@@ -108,7 +106,7 @@
       "description": "Agente di implementazione diretta con accesso completo agli strumenti",
       "mode": "primary",
       "color": "#34d399",
-      "prompt": "{file:~/.config/opencode/agents/build.md}",
+      "prompt": "{file:~/.config/opencode/agent/build.md}",
       "permission": {
         "read": "allow", "edit": "allow", "write": "allow", "bash": "allow",
         "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
@@ -118,10 +116,10 @@
 
     // --- Agent SPECIALIZZATI (subagent) ---
     "reviewer": {
-      "description": "Revisore del codice — analisi qualità, sicurezza e best practices",
+      "description": "Revisore del codice â€” analisi qualitÃ , sicurezza e best practices",
       "mode": "subagent",
       "color": "#f43f5e",
-      "prompt": "{file:~/.config/opencode/agents/reviewer.md}",
+      "prompt": "{file:~/.config/opencode/agent/reviewer.md}",
       "permission": {
         "read": "allow", "edit": "deny", "write": "deny",
         "bash": "allow", "glob": "allow", "grep": "allow",
@@ -129,10 +127,10 @@
       }
     },
     "debugger": {
-      "description": "Agente specializzato in debugging — trova e risolve bug",
+      "description": "Agente specializzato in debugging â€” trova e risolve bug",
       "mode": "subagent",
       "color": "#ef4444",
-      "prompt": "{file:~/.config/opencode/agents/debugger.md}",
+      "prompt": "{file:~/.config/opencode/agent/debugger.md}",
       "permission": {
         "read": "allow", "edit": "allow", "write": "allow", "bash": "allow",
         "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
@@ -140,10 +138,10 @@
       }
     },
     "optimizer": {
-      "description": "Agente di ottimizzazione performance — codice + infrastruttura",
+      "description": "Agente di ottimizzazione performance â€” codice + infrastruttura",
       "mode": "subagent",
       "color": "#10b981",
-      "prompt": "{file:~/.config/opencode/agents/optimizer.md}",
+      "prompt": "{file:~/.config/opencode/agent/optimizer.md}",
       "permission": {
         "read": "allow", "edit": "allow", "write": "allow", "bash": "allow",
         "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
@@ -151,10 +149,10 @@
       }
     },
     "tester": {
-      "description": "Agente di test — scrive, esegue e mantiene test",
+      "description": "Agente di test â€” scrive, esegue e mantiene test",
       "mode": "subagent",
       "color": "#8b5cf6",
-      "prompt": "{file:~/.config/opencode/agents/tester.md}",
+      "prompt": "{file:~/.config/opencode/agent/tester.md}",
       "permission": {
         "read": "allow", "edit": "allow", "write": "allow", "bash": "allow",
         "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
@@ -162,10 +160,10 @@
       }
     },
     "docker": {
-      "description": "Agente DevOps/Docker — container, compose, CI/CD, deploy",
+      "description": "Agente DevOps/Docker â€” container, compose, CI/CD, deploy",
       "mode": "subagent",
       "color": "#0ea5e9",
-      "prompt": "{file:~/.config/opencode/agents/docker.md}",
+      "prompt": "{file:~/.config/opencode/agent/docker.md}",
       "permission": {
         "read": "allow", "edit": "allow", "write": "allow", "bash": "allow",
         "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
@@ -173,10 +171,10 @@
       }
     },
     "database": {
-      "description": "Agente database — SQL, SQLite, PostgreSQL, ottimizzazione query",
+      "description": "Agente database â€” SQL, SQLite, PostgreSQL, ottimizzazione query",
       "mode": "subagent",
       "color": "#14b8a6",
-      "prompt": "{file:~/.config/opencode/agents/database.md}",
+      "prompt": "{file:~/.config/opencode/agent/database.md}",
       "permission": {
         "read": "allow", "edit": "allow", "write": "allow", "bash": "allow",
         "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
@@ -184,10 +182,10 @@
       }
     },
     "refactor": {
-      "description": "Agente di refactoring — ristruttura codice senza cambiarne il comportamento",
+      "description": "Agente di refactoring â€” ristruttura codice senza cambiarne il comportamento",
       "mode": "subagent",
       "color": "#f97316",
-      "prompt": "{file:~/.config/opencode/agents/refactor.md}",
+      "prompt": "{file:~/.config/opencode/agent/refactor.md}",
       "permission": {
         "read": "allow", "edit": "allow", "write": "allow", "bash": "allow",
         "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
@@ -195,10 +193,10 @@
       }
     },
     "scriptwriter": {
-      "description": "Agente per scripting — PowerShell, bash, Python automation",
+      "description": "Agente per scripting â€” PowerShell, bash, Python automation",
       "mode": "subagent",
       "color": "#eab308",
-      "prompt": "{file:~/.config/opencode/agents/scriptwriter.md}",
+      "prompt": "{file:~/.config/opencode/agent/scriptwriter.md}",
       "permission": {
         "read": "allow", "edit": "allow", "write": "allow", "bash": "allow",
         "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
@@ -208,10 +206,10 @@
   },
 
   // ==========================================
-  // MCP SERVERS — 15+ server per ogni evenienza
+  // MCP SERVERS â€” 15+ server per ogni evenienza
   // ==========================================
   "mcp": {
-    // --- Server già esistenti ---
+    // --- Server giÃ  esistenti ---
     "filesystem": {
       "type": "local",
       "command": ["npx", "-y", "@modelcontextprotocol/server-filesystem", "C:\\Users\\franc"],
@@ -312,7 +310,7 @@
   },
 
   // ==========================================
-  // LSP SERVERS — Language support
+  // LSP SERVERS â€” Language support
   // ==========================================
   "lsp": {
     "typescript": {
