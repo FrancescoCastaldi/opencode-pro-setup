@@ -4,4 +4,3 @@ package-lock.json
 bun.lock
 .env
 *.log
-.slim/

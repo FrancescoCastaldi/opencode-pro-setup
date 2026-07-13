@@ -1,4 +1,4 @@
-{
+﻿{
   "$schema": "https://opencode.ai/config.json",
   "username": "FrancescoCastaldi",
 
@@ -10,7 +10,7 @@
   // "small_model": "opencode-go/*",      // modello per tasks semplici
 
   // ==========================================
-  // SKILLS â€” percorsi per SKILL.md
+  // SKILLS Ã¢â‚¬â€ percorsi per SKILL.md
   // ==========================================
   "skills": {
     "paths": ["~/.config/opencode/skills"
@@ -18,7 +18,7 @@
   },
 
   // ==========================================
-  // REFERENCES â€” documentazione esterna
+  // REFERENCES Ã¢â‚¬â€ documentazione esterna
   // ==========================================
   "references": {
     "react": {
@@ -39,7 +39,7 @@
   },
 
   // ==========================================
-  // AGENTS â€” definizione agenti
+  // AGENTS Ã¢â‚¬â€ definizione agenti
   // ==========================================
   "agent": {
     // Configurazioni speciali
@@ -116,7 +116,7 @@
 
     // --- Agent SPECIALIZZATI (subagent) ---
     "reviewer": {
-      "description": "Revisore del codice â€” analisi qualitÃ , sicurezza e best practices",
+      "description": "Revisore del codice Ã¢â‚¬â€ analisi qualitÃƒÂ , sicurezza e best practices",
       "mode": "subagent",
       "color": "#f43f5e",
       "prompt": "{file:~/.config/opencode/agent/reviewer.md}",
@@ -127,7 +127,7 @@
       }
     },
     "debugger": {
-      "description": "Agente specializzato in debugging â€” trova e risolve bug",
+      "description": "Agente specializzato in debugging Ã¢â‚¬â€ trova e risolve bug",
       "mode": "subagent",
       "color": "#ef4444",
       "prompt": "{file:~/.config/opencode/agent/debugger.md}",
@@ -138,7 +138,7 @@
       }
     },
     "optimizer": {
-      "description": "Agente di ottimizzazione performance â€” codice + infrastruttura",
+      "description": "Agente di ottimizzazione performance Ã¢â‚¬â€ codice + infrastruttura",
       "mode": "subagent",
       "color": "#10b981",
       "prompt": "{file:~/.config/opencode/agent/optimizer.md}",
@@ -149,7 +149,7 @@
       }
     },
     "tester": {
-      "description": "Agente di test â€” scrive, esegue e mantiene test",
+      "description": "Agente di test Ã¢â‚¬â€ scrive, esegue e mantiene test",
       "mode": "subagent",
       "color": "#8b5cf6",
       "prompt": "{file:~/.config/opencode/agent/tester.md}",
@@ -160,7 +160,7 @@
       }
     },
     "docker": {
-      "description": "Agente DevOps/Docker â€” container, compose, CI/CD, deploy",
+      "description": "Agente DevOps/Docker Ã¢â‚¬â€ container, compose, CI/CD, deploy",
       "mode": "subagent",
       "color": "#0ea5e9",
       "prompt": "{file:~/.config/opencode/agent/docker.md}",
@@ -171,7 +171,7 @@
       }
     },
     "database": {
-      "description": "Agente database â€” SQL, SQLite, PostgreSQL, ottimizzazione query",
+      "description": "Agente database Ã¢â‚¬â€ SQL, SQLite, PostgreSQL, ottimizzazione query",
       "mode": "subagent",
       "color": "#14b8a6",
       "prompt": "{file:~/.config/opencode/agent/database.md}",
@@ -182,7 +182,7 @@
       }
     },
     "refactor": {
-      "description": "Agente di refactoring â€” ristruttura codice senza cambiarne il comportamento",
+      "description": "Agente di refactoring Ã¢â‚¬â€ ristruttura codice senza cambiarne il comportamento",
       "mode": "subagent",
       "color": "#f97316",
       "prompt": "{file:~/.config/opencode/agent/refactor.md}",
@@ -193,7 +193,7 @@
       }
     },
     "scriptwriter": {
-      "description": "Agente per scripting â€” PowerShell, bash, Python automation",
+      "description": "Agente per scripting Ã¢â‚¬â€ PowerShell, bash, Python automation",
       "mode": "subagent",
       "color": "#eab308",
       "prompt": "{file:~/.config/opencode/agent/scriptwriter.md}",
@@ -206,79 +206,58 @@
   },
 
   // ==========================================
-  // MCP SERVERS â€” 15+ server per ogni evenienza
+  // MCP SERVERS Ã¢â‚¬â€ 15+ server per ogni evenienza
   // ==========================================
   "mcp": {
-    // --- Server core ---
+    // --- Server giÃƒÂ  esistenti ---
     "playwright": {
       "type": "local",
-      "command": ["npx", "-y", "@playwright/mcp"],
+      "command": ["node", "C:\\Users\\fracas\\.config\\opencode\\node_modules\\@playwright\\mcp\\cli.js"],
       "enabled": true,
-      "timeout": 30000
+      "timeout": 60000
     },
     "github": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
+      "command": ["node", "C:\\Users\\fracas\\.config\\opencode\\node_modules\\@modelcontextprotocol\\server-github\\dist\\index.js"],
       "enabled": true,
-      "timeout": 30000,
+      "timeout": 60000,
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "{file:~/.config/opencode/.github-token}"
       }
     },
     "puppeteer": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-puppeteer"],
+      "command": ["node", "C:\\Users\\fracas\\.config\\opencode\\node_modules\\@modelcontextprotocol\\server-puppeteer\\dist\\index.js"],
       "enabled": false,
       "description": "Disabilitato - playwright giÃ  copre browser automation"
     },
-    "excel": {
-      "type": "local",
-      "command": ["npx", "-y", "@negokaz/excel-mcp-server"],
-      "enabled": true,
-      "timeout": 30000,
-      "env": {
-        "EXCEL_MCP_PAGING_CELLS_LIMIT": "4000"
-      }
-    },
     "opencode": {
       "type": "local",
-      "command": ["npx", "-y", "opencode-mcp"],
+      "command": ["node", "C:\\Users\\fracas\\.config\\opencode\\node_modules\\opencode-mcp\\dist\\index.js"],
       "enabled": true,
-      "timeout": 30000
-    },
-
-    // --- Server NUOVI: Database & Storage ---
-    "postgres": {
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-postgres", "postgresql://localhost/mydb"],
-      "enabled": false
-    },
-    "redis": {
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-redis", "redis://localhost:6379"],
-      "enabled": false
+      "timeout": 60000
     },
 
     // --- Server NUOVI: Web & Search ---
     "fetch": {
       "type": "local",
-      "command": ["npx", "-y", "mcp-fetch-server"],
+      "command": ["node", "C:\\Users\\fracas\\.config\\opencode\\node_modules\\mcp-fetch-server\\dist\\index.js"],
       "enabled": true,
-      "timeout": 30000
+      "timeout": 60000
     },
 
     // --- Server NUOVI: AI & Reasoning ---
     "sequential-thinking": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "command": ["node", "C:\\Users\\fracas\\.config\\opencode\\node_modules\\@modelcontextprotocol\\server-sequential-thinking\\dist\\index.js"],
       "enabled": true,
-      "timeout": 30000
+      "timeout": 60000
     },
     "memory": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-memory"],
+      "command": ["node", "C:\\Users\\fracas\\.config\\opencode\\node_modules\\@modelcontextprotocol\\server-memory\\dist\\index.js"],
       "enabled": true,
-      "timeout": 30000
+      "timeout": 60000
     },
     "mcp-ops": {
       "type": "local",
@@ -300,7 +279,7 @@
   },
 
   // ==========================================
-  // LSP SERVERS â€” Language support
+  // LSP SERVERS Ã¢â‚¬â€ Language support
   // ==========================================
   "lsp": {
     "typescript": {
@@ -387,4 +366,6 @@
     "tail_turns": 15
   }
 }
+
+
 
