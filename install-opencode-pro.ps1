@@ -331,7 +331,7 @@ function Step-CreateDirectories {
     Write-Step "STEP 3/6 - Creating directory structure..."
     Show-ProgressBar -Percent 45 -Label "Creating directories"
 
-    $subDirs = @('agent', 'plugins', 'skills', 'snippet', 'memory')
+    $subDirs = @('agents', 'plugins', 'skills', 'snippet', 'memory')
 
     # Create main config dir if needed
     if (-not (Test-Path $CONFIG_DIR)) {
@@ -419,13 +419,23 @@ function Step-DeployConfiguration {
     Write-Ok "Root config files deployed"
 
     # --- 4b: Deploy agent files ---
-    $agentSource = Join-Path $configSource "agent"
-    if (Test-Path $agentSource) {
-        $agentDest = Join-Path $CONFIG_DIR "agent"
-        Get-ChildItem -Path $agentSource -File | ForEach-Object {
-            Copy-Item -Path $_.FullName -Destination $agentDest -Force
+    $agentDirs = @('agents', 'agent')
+    $deployed = $false
+    foreach ($agentDir in $agentDirs) {
+        $agentSource = Join-Path $configSource $agentDir
+        if (Test-Path $agentSource) {
+            $agentDest = Join-Path $CONFIG_DIR "agents"
+            if (-not (Test-Path $agentDest)) { New-Item -ItemType Directory -Path $agentDest -Force | Out-Null }
+            Get-ChildItem -Path $agentSource -File | ForEach-Object {
+                Copy-Item -Path $_.FullName -Destination $agentDest -Force
+            }
+            $deployed = $true
+            Write-Ok "Agent files deployed from: $agentDir"
+            break
         }
-        Write-Ok "Agent files deployed"
+    }
+    if (-not $deployed) {
+        Write-Warn "Agent directory not found (neither 'agents' nor 'agent')" 
     }
 
     # --- 4c: Deploy custom plugins ---
@@ -724,7 +734,7 @@ function Step-Verify {
     }
 
     # Agent
-    if (Test-Path (Join-Path $CONFIG_DIR "agent\orchestrator.md")) {
+    if (Test-Path (Join-Path $CONFIG_DIR "agents\orchestrator.md")) {
         $report += "Agent: orchestrator"
     }
 
