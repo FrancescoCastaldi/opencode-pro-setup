@@ -663,6 +663,37 @@ function Step-ConfigureAPI {
 }
 
 # ============================================================
+# STEP 5d: CONFIGURE PROVIDERS
+# ============================================================
+function Step-ConfigureProviders {
+    Write-Step "  -> Provider Configuration"
+
+    Write-Info "Configuring OpenCode providers..."
+    try {
+        $providers = opencode providers list 2>$null
+        if ($LASTEXITCODE -eq 0) {
+            if ($providers -match "opencode") {
+                Write-Ok "opencode provider already configured"
+            } else {
+                Write-Info "Adding opencode provider..."
+                opencode providers add opencode 2>$null
+                Write-Ok "opencode provider configured"
+            }
+            if ($providers -match "opencode-go") {
+                Write-Ok "opencode-go provider already configured"
+            } else {
+                Write-Info "Adding opencode-go provider..."
+                opencode providers add opencode-go 2>$null
+                Write-Ok "opencode-go provider configured"
+            }
+        }
+    } catch {
+        Write-Warn "Provider auto-configuration skipped: $_"
+        Write-Info "You can configure providers later with: opencode providers add <name>"
+    }
+}
+
+# ============================================================
 # STEP 6: VERIFY
 # ============================================================
 function Step-Verify {
@@ -764,6 +795,7 @@ try {
     Step-InstallDependencies
     Step-InstallMCPServers
     Step-ConfigureAPI
+    Step-ConfigureProviders
     Step-Verify
 
 } catch {
