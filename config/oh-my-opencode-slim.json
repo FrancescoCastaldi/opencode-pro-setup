@@ -2,56 +2,6 @@
   "$schema": "https://unpkg.com/oh-my-opencode-slim@latest/oh-my-opencode-slim.schema.json",
   "preset": "opencode-go",
   "presets": {
-    "openai": {
-      "orchestrator": {
-        "model": "openai/gpt-5.5",
-        "variant": "high",
-        "skills": ["*"],
-        "mcps": ["*", "!context7"]
-      },
-      "oracle": {
-        "model": "openai/gpt-5.5",
-        "variant": "high",
-        "skills": ["simplify"],
-        "mcps": []
-      },
-      "council": {
-        "model": "openai/gpt-5.5",
-        "variant": "high",
-        "skills": [],
-        "mcps": []
-      },
-      "librarian": {
-        "model": "openai/gpt-5.5",
-        "variant": "high",
-        "skills": [],
-        "mcps": ["websearch", "context7", "gh_grep"]
-      },
-      "explorer": {
-        "model": "openai/gpt-5.5",
-        "variant": "high",
-        "skills": [],
-        "mcps": []
-      },
-      "designer": {
-        "model": "openai/gpt-5.5",
-        "variant": "medium",
-        "skills": [],
-        "mcps": []
-      },
-      "fixer": {
-        "model": "openai/gpt-5.5",
-        "variant": "high",
-        "skills": [],
-        "mcps": []
-      },
-      "observer": {
-        "model": "openai/gpt-5.5",
-        "variant": "high",
-        "skills": [],
-        "mcps": []
-      }
-    },
     "opencode-go": {
       "explorer": {
         "model": "opencode-go/deepseek-v4-flash",
