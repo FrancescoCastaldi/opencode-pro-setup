@@ -53,52 +53,49 @@
       }
     },
     "opencode-go": {
-      "orchestrator": {
-        "model": "opencode/deepseek-v4-flash-free",
-        "variant": "high",
-        "skills": ["*"],
-        "mcps": ["*", "!context7"]
-      },
-      "oracle": {
-        "model": "opencode/deepseek-v4-flash-free",
-        "variant": "high",
-        "skills": ["simplify"],
-        "mcps": []
-      },
-      "council": {
-        "model": "opencode/deepseek-v4-flash-free",
-        "variant": "high",
+      "explorer": {
+        "model": "opencode-go/deepseek-v4-flash",
         "skills": [],
         "mcps": []
       },
       "librarian": {
-        "model": "opencode/deepseek-v4-flash-free",
-        "variant": "high",
+        "model": "opencode-go/deepseek-v4-flash",
         "skills": [],
         "mcps": ["websearch", "context7", "gh_grep"]
       },
-      "explorer": {
-        "model": "opencode/deepseek-v4-flash-free",
-        "variant": "high",
-        "skills": [],
-        "mcps": []
-      },
-      "designer": {
-        "model": "opencode/deepseek-v4-flash-free",
-        "variant": "medium",
+      "observer": {
+        "model": "opencode-go/deepseek-v4-flash",
         "skills": [],
         "mcps": []
       },
       "fixer": {
-        "model": "opencode/deepseek-v4-flash-free",
+        "model": "opencode-go/kimi-k2.7-code",
+        "variant": "low",
+        "skills": [],
+        "mcps": []
+      },
+      "designer": {
+        "model": "opencode-go/qwen3.6-plus",
+        "variant": "medium",
+        "skills": [],
+        "mcps": []
+      },
+      "council": {
+        "model": "opencode-go/qwen3.7-plus",
         "variant": "high",
         "skills": [],
         "mcps": []
       },
-      "observer": {
-        "model": "opencode/deepseek-v4-flash-free",
+      "orchestrator": {
+        "model": "opencode-go/kimi-k3",
+        "variant": "medium",
+        "skills": ["*"],
+        "mcps": ["*", "!context7"]
+      },
+      "oracle": {
+        "model": "opencode-go/qwen3.7-max",
         "variant": "high",
-        "skills": [],
+        "skills": ["simplify"],
         "mcps": []
       }
     }
