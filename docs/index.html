@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="OpenCode PRO Setup - Batteries-included professional configuration for the OpenCode AI editor with 24+ skills, MCP servers, multi-agent orchestration, and LSP support.">
+    <title>OpenCode PRO Setup - Professional AI Editor Configuration</title>
+    <style>
+        /* ===== Reset & Base ===== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a26;
+            --bg-card-hover: #22222f;
+            --border-color: rgba(255, 255, 255, 0.06);
+            --border-glow: rgba(139, 92, 246, 0.3);
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b8;
+            --text-muted: #6b6b80;
+            --accent-green: #34d399;
+            --accent-green-dim: rgba(52, 211, 153, 0.15);
+            --accent-purple: #8b5cf6;
+            --accent-purple-dim: rgba(139, 92, 246, 0.15);
+            --accent-blue: #60a5fa;
+            --accent-amber: #fbbf24;
+            --accent-rose: #fb7185;
+            --gradient-primary: linear-gradient(135deg, #34d399, #8b5cf6);
+            --gradient-hero: linear-gradient(135deg, #34d399 0%, #8b5cf6 50%, #60a5fa 100%);
+            --gradient-card: linear-gradient(145deg, rgba(52, 211, 153, 0.05), rgba(139, 92, 246, 0.05));
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', system-ui, sans-serif;
+            --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+            --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.15);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ===== Background Noise Texture ===== */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* ===== Scrollbar ===== */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--bg-card); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-purple); }
+
+        /* ===== Layout ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        section {
+            padding: 100px 0;
+        }
+
+        /* ===== Animation Keyframes ===== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== Navigation ===== */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.3s ease;
+        }
+
+        nav .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .nav-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-cta {
+            background: var(--gradient-primary);
+            color: var(--bg-primary) !important;
+            padding: 8px 20px;
+            border-radius: var(--radius-sm);
+            font-weight: 600 !important;
+            transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(52, 211, 153, 0.3);
+        }
+
+        .nav-mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* ===== Hero Section ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            padding-top: 64px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(to top, var(--bg-primary), transparent);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 100px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        .hero-badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 .gradient-text {
+            background: var(--gradient-hero);
+            background-size: 200% 200%;
+            animation: gradientShift 6s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2vw, 1.35rem);
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
+        }
+
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            border: none;
+            font-family: var(--font-sans);
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: var(--bg-primary);
+            box-shadow: 0 4px 20px rgba(52, 211, 153, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(52, 211, 153, 0.35);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-glow);
+            transform: translateY(-2px);
+        }
+
+        .hero-stats {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 48px;
+            margin-top: 64px;
+            flex-wrap: wrap;
+        }
+
+        .hero-stat {
+            text-align: center;
+        }
+
+        .hero-stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* ===== Section Headers ===== */
+        .section-header {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-green);
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 2.75rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            margin-bottom: 16px;
+        }
+
+        .section-desc {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ===== What's Included - Feature Cards ===== */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--border-glow);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .feature-icon.green { background: var(--accent-green-dim); }
+        .feature-icon.purple { background: var(--accent-purple-dim); }
+        .feature-icon.blue { background: rgba(96, 165, 250, 0.15); }
+        .feature-icon.amber { background: rgba(251, 191, 36, 0.15); }
+        .feature-icon.rose { background: rgba(251, 113, 133, 0.15); }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .feature-card .feature-count {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-green);
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .feature-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 16px;
+        }
+
+        .feature-tag {
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* ===== Skills Detail ===== */
+        .skills-section {
+            background: var(--bg-secondary);
+        }
+
+        .skills-packages {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .skill-package {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .skill-package:hover {
+            border-color: var(--border-glow);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .skill-package-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .skill-package-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .skill-package-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .skill-package-header .skill-count {
+            margin-left: auto;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+
+        .skill-list {
+            list-style: none;
+            padding: 8px 0;
+        }
+
+        .skill-list li {
+            padding: 10px 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            transition: color 0.2s ease, background 0.2s ease;
+        }
+
+        .skill-list li:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .skill-list li::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            flex-shrink: 0;
+        }
+
+        /* ===== Agents Grid ===== */
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+        }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .agent-card:hover {
+            border-color: var(--border-glow);
+            transform: translateY(-2px);
+        }
+
+        .agent-card .agent-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .agent-card .agent-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            color: var(--text-primary);
+        }
+
+        .agent-card.orchestrator {
+            border-color: var(--accent-green);
+            background: var(--accent-green-dim);
+        }
+
+        /* ===== Install Section ===== */
+        .install-section {
+            background: var(--bg-secondary);
+        }
+
+        .install-steps {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .install-step {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 40px;
+            align-items: flex-start;
+        }
+
+        .install-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-number {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--bg-primary);
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            margin-top: 12px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--accent-green);
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block .code-label {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-family: var(--font-sans);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ===== Parameters Table ===== */
+        .params-section {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .params-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .params-table th,
+        .params-table td {
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .params-table th {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+        }
+
+        .params-table td:first-child {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: var(--accent-purple);
+            font-weight: 600;
+        }
+
+        .params-table td {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .params-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* ===== CTA Section ===== */
+        .cta-section {
+            text-align: center;
+            position: relative;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .cta-box {
+            position: relative;
+            z-index: 1;
+            background: var(--gradient-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 64px 40px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .cta-box h2 {
+            font-size: clamp(1.75rem, 3vw, 2.25rem);
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .cta-box p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 32px;
+        }
+
+        /* ===== Footer ===== */
+        footer {
+            padding: 48px 0;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .footer-copy {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            section { padding: 64px 0; }
+
+            .nav-links { display: none; }
+            .nav-mobile-toggle { display: block; }
+
+            .nav-links.open {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 64px;
+                left: 0;
+                right: 0;
+                background: rgba(10, 10, 15, 0.95);
+                backdrop-filter: blur(20px);
+                padding: 24px;
+                gap: 20px;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .hero-stats { gap: 24px; }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .skills-packages {
+                grid-template-columns: 1fr;
+            }
+
+            .agents-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+
+            .install-step {
+                gap: 16px;
+            }
+
+            .cta-box {
+                padding: 40px 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 { font-size: 2rem; }
+            .hero-actions { flex-direction: column; }
+            .hero-actions .btn { width: 100%; justify-content: center; }
+            .agents-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <a href="#" class="nav-logo">
+                <span class="nav-logo-icon">&#9889;</span>
+                OpenCode PRO
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#install">Install</a></li>
+                <li><a href="#params">Parameters</a></li>
+                <li><a href="https://github.com/FrancescoCastaldi/opencode-pro-setup" class="nav-cta">GitHub</a></li>
+            </ul>
+            <button class="nav-mobile-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')" aria-label="Toggle navigation">&#9776;</button>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="hero-badge-dot"></span>
+                    Windows &bull; OpenCode 1.17+
+                </div>
+                <h1>
+                    Professional AI Editor<br>
+                    <span class="gradient-text">Configuration, Done Right</span>
+                </h1>
+                <p class="hero-subtitle">
+                    A batteries-included setup for the OpenCode AI editor. Skills, MCP servers, multi-agent orchestration, LSP support, and plugins — installed in one click.
+                </p>
+                <div class="hero-actions">
+                    <a href="#install" class="btn btn-primary">
+                        &#x2B07; Install Now
+                    </a>
+                    <a href="https://github.com/FrancescoCastaldi/opencode-pro-setup" class="btn btn-secondary">
+                        View on GitHub &#x2197;
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">24+</div>
+                        <div class="hero-stat-label">Skills</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">13</div>
+                        <div class="hero-stat-label">Agents</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">11</div>
+                        <div class="hero-stat-label">MCP Servers</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">7</div>
+                        <div class="hero-stat-label">Plugins</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">6</div>
+                        <div class="hero-stat-label">LSP Servers</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What's Included -->
+    <section id="features">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <div class="section-label">&#9881; What's Included</div>
+                <h2 class="section-title">Everything You Need, Pre-Configured</h2>
+                <p class="section-desc">No manual setup. No hunting for packages. Just run the installer and get a complete professional environment.</p>
+            </div>
+            <div class="features-grid">
+                <!-- Skills -->
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon green">&#x1F4DA;</div>
+                    <h3>Skills</h3>
+                    <span class="feature-count">24+ Skills in 3 Packages</span>
+                    <p>Specialized capabilities for GitHub workflows, codebase management, and website operations.</p>
+                    <div class="feature-tags">
+                        <span class="feature-tag">deepwork</span>
+                        <span class="feature-tag">codemap</span>
+                        <span class="feature-tag">simplify</span>
+                        <span class="feature-tag">reflect</span>
+                        <span class="feature-tag">clonedeps</span>
+                        <span class="feature-tag">worktrees</span>
+                        <span class="feature-tag">+ 18 more</span>
+                    </div>
+                </div>
+
+                <!-- Agents -->
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon purple">&#x1F916;</div>
+                    <h3>Agents</h3>
+                    <span class="feature-count">13 Specialized Agents</span>
+                    <p>From orchestration to debugging — each agent is tuned for a specific role in your workflow.</p>
+                    <div class="feature-tags">
+                        <span class="feature-tag">orchestrator</span>
+                        <span class="feature-tag">general</span>
+                        <span class="feature-tag">explorer</span>
+                        <span class="feature-tag">brainstormer</span>
+                        <span class="feature-tag">build</span>
+                        <span class="feature-tag">+ 8 more</span>
+                    </div>
+                </div>
+
+                <!-- Plugins -->
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon blue">&#x1F9E9;</div>
+                    <h3>Plugins</h3>
+                    <span class="feature-count">7 Plugins</span>
+                    <p>Official and custom plugins for memory, snippets, supermemory, notifications, and more.</p>
+                    <div class="feature-tags">
+                        <span class="feature-tag">opencode-mem</span>
+                        <span class="feature-tag">opencode-snippets</span>
+                        <span class="feature-tag">supermemory</span>
+                        <span class="feature-tag">context-pruning</span>
+                        <span class="feature-tag">env-protection</span>
+                        <span class="feature-tag">+ 2 more</span>
+                    </div>
+                </div>
+
+                <!-- MCP Servers -->
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon amber">&#x1F50C;</div>
+                    <h3>MCP Servers</h3>
+                    <span class="feature-count">11 MCP Servers</span>
+                    <p>Connect to external tools and services — browser automation, GitHub, web fetching, memory, and more.</p>
+                    <div class="feature-tags">
+                        <span class="feature-tag">playwright</span>
+                        <span class="feature-tag">github</span>
+                        <span class="feature-tag">fetch</span>
+                        <span class="feature-tag">sequential-thinking</span>
+                        <span class="feature-tag">memory</span>
+                        <span class="feature-tag">+ 6 more</span>
+                    </div>
+                </div>
+
+                <!-- LSP Servers -->
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon rose">&#x1F4BB;</div>
+                    <h3>LSP Servers</h3>
+                    <span class="feature-count">6 Language Servers</span>
+                    <p>Intelligent code completion, diagnostics, and go-to-definition for your most-used languages.</p>
+                    <div class="feature-tags">
+                        <span class="feature-tag">TypeScript</span>
+                        <span class="feature-tag">HTML</span>
+                        <span class="feature-tag">CSS</span>
+                        <span class="feature-tag">JSON</span>
+                        <span class="feature-tag">Markdown</span>
+                        <span class="feature-tag">YAML</span>
+                    </div>
+                </div>
+
+                <!-- Installer -->
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon green">&#x26A1;</div>
+                    <h3>One-Click Installer</h3>
+                    <span class="feature-count">PowerShell + .exe</span>
+                    <p>Double-click install.exe or run the PowerShell script. Everything is automated — prerequisites, cleanup, deploy, verify.</p>
+                    <div class="feature-tags">
+                        <span class="feature-tag">Auto-cleanup</span>
+                        <span class="feature-tag">API key prompts</span>
+                        <span class="feature-tag">Verification</span>
+                        <span class="feature-tag">-DryRun</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Detail -->
+    <section id="skills" class="skills-section">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <div class="section-label">&#x1F4DA; Skills</div>
+                <h2 class="section-title">24+ Skills, Organized</h2>
+                <p class="section-desc">Skills are grouped into three focused packages for different aspects of your development workflow.</p>
+            </div>
+            <div class="skills-packages">
+                <!-- GitHub Management -->
+                <div class="skill-package animate-on-scroll">
+                    <div class="skill-package-header">
+                        <div class="skill-package-icon" style="background: var(--accent-purple-dim);">&#x1F409;</div>
+                        <h3>GitHub Management</h3>
+                        <span class="skill-count">8 skills</span>
+                    </div>
+                    <ul class="skill-list">
+                        <li>github</li>
+                        <li>github-repo-optimizer</li>
+                        <li>github-issue-triage</li>
+                        <li>git-workflow-manager</li>
+                        <li>git-release</li>
+                        <li>using-git-worktrees</li>
+                        <li>worktrees</li>
+                        <li>release-smoke-test</li>
+                    </ul>
+                </div>
+
+                <!-- Codebase Management -->
+                <div class="skill-package animate-on-scroll">
+                    <div class="skill-package-header">
+                        <div class="skill-package-icon" style="background: var(--accent-green-dim);">&#x1F4BB;</div>
+                        <h3>Codebase Management</h3>
+                        <span class="skill-count">9 skills</span>
+                    </div>
+                    <ul class="skill-list">
+                        <li>deepwork</li>
+                        <li>simplify</li>
+                        <li>codemap</li>
+                        <li>clonedeps</li>
+                        <li>reflect</li>
+                        <li>codebase-refactorer</li>
+                        <li>codebase-analyzer</li>
+                        <li>codebase-documenter</li>
+                        <li>verification-planning</li>
+                    </ul>
+                </div>
+
+                <!-- Website Management -->
+                <div class="skill-package animate-on-scroll">
+                    <div class="skill-package-header">
+                        <div class="skill-package-icon" style="background: rgba(96, 165, 250, 0.15);">&#x1F310;</div>
+                        <h3>Website Management</h3>
+                        <span class="skill-count">7 skills</span>
+                    </div>
+                    <ul class="skill-list">
+                        <li>web-architect</li>
+                        <li>site-deployer</li>
+                        <li>site-optimizer</li>
+                        <li>site-health-checker</li>
+                        <li>dependency-auditor</li>
+                        <li>repo-scaffold</li>
+                        <li>oh-my-opencode-slim</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Agents Detail -->
+            <div style="margin-top: 64px;">
+                <div class="section-header animate-on-scroll">
+                    <div class="section-label">&#x1F916; Agents</div>
+                    <h2 class="section-title">13 Specialized Agents</h2>
+                    <p class="section-desc">Each agent has a specific role, model, and permission set. The orchestrator coordinates them all.</p>
+                </div>
+                <div class="agents-grid">
+                    <div class="agent-card orchestrator animate-on-scroll">
+                        <span class="agent-icon">&#x26A1;</span>
+                        <span class="agent-name">orchestrator</span>
+                    </div>
+                    <div class="agent-card animate-on-scroll">
+                        <span class="agent-icon">&#x1F4AC;</span>
+                        <span class="agent-name">general</span>
+                    </div>
+                    <div class="agent-card animate-on-scroll">
+                        <span class="agent-icon">&#x1F50D;</span>
+                        <span class="agent-name">explore</span>
+                    </div>
+                    <div class="agent-card animate-on-scroll">
+                        <span class="agent-icon">&#x1F4A1;</span>
+                        <span class="agent-name">brainstormer</span>
+                    </div>
+                    <div class="agent-card animate-on-scroll">
+                        <span class="agent-icon">&#x1F528;</span>
+                        <span class="agent-name">build</span>
+                    </div>
+                    <div class="agent-card animate-on-scroll">
+                        <span class="agent-icon">&#x1F440;</span>
+                        <span class="agent-name">reviewer</span>
+                    </div>
+                    <div class="agent-card animate-on-scroll">
+                        <span class="agent-icon">&#x1F41B;</span>
+                        <span class="agent-name">debugger</span>
+                    </div>
+                    <div class="agent-card animate-on-scroll">
+                        <span class="agent-icon">&#x2699;&#xFE0F;</span>
+                        <span class="agent-name">optimizer</span>
+                    </div>
+                    <div class="agent-card animate-on-scroll">
+                        <span class="agent-icon">&#x1F9EA;</span>
+                        <span class="agent-name">tester</span>
+                    </div>
+                    <div class="agent-card animate-on-scroll">
+                        <span class="agent-icon">&#x1F433;</span>
+                        <span class="agent-name">docker</span>
+                    </div>
+                    <div class="agent-card animate-on-scroll">
+                        <span class="agent-icon">&#x1F5C4;&#xFE0F;</span>
+                        <span class="agent-name">database</span>
+                    </div>
+                    <div class="agent-card animate-on-scroll">
+                        <span class="agent-icon">&#x1F504;</span>
+                        <span class="agent-name">refactor</span>
+                    </div>
+                    <div class="agent-card animate-on-scroll">
+                        <span class="agent-icon">&#x1F4DC;</span>
+                        <span class="agent-name">scriptwriter</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Install Guide -->
+    <section id="install" class="install-section">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <div class="section-label">&#x2B07; Installation</div>
+                <h2 class="section-title">Up and Running in Minutes</h2>
+                <p class="section-desc">Four simple steps. The installer handles everything else.</p>
+            </div>
+            <div class="install-steps">
+                <div class="install-step animate-on-scroll">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Download the Installer</h3>
+                        <p>Get the latest <code>install.exe</code> from the GitHub Releases page, or clone the repository.</p>
+                        <div class="code-block">
+                            <span class="code-label">PowerShell</span>
+                            git clone https://github.com/FrancescoCastaldi/opencode-pro-setup.git<br>
+                            cd opencode-pro-setup
+                        </div>
+                    </div>
+                </div>
+                <div class="install-step animate-on-scroll">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Run the Installer</h3>
+                        <p>Double-click <code>install.exe</code> and accept the UAC prompt. The installer runs with administrator privileges automatically.</p>
+                        <div class="code-block">
+                            <span class="code-label">Alternative</span>
+                            powershell -ExecutionPolicy Bypass -File install.ps1
+                        </div>
+                    </div>
+                </div>
+                <div class="install-step animate-on-scroll">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Enter Your API Keys</h3>
+                        <p>The installer will prompt for three keys. Have them ready:</p>
+                        <div class="code-block">
+                            <span class="code-label">Required Keys</span>
+                            &#x1F511; OpenCode Zen API key<br>
+                            &#x1F511; OpenCode Go API key<br>
+                            &#x1F511; GitHub Personal Access Token
+                        </div>
+                    </div>
+                </div>
+                <div class="install-step animate-on-scroll">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>You're Done!</h3>
+                        <p>The installer verifies everything — CLI version, config, plugins, skills, and dependencies. Start OpenCode and enjoy your professional setup.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Install Parameters -->
+            <div id="params" class="params-section" style="margin-top: 80px;">
+                <div class="section-header animate-on-scroll">
+                    <div class="section-label">&#x1F527; Power Users</div>
+                    <h2 class="section-title">Install Parameters</h2>
+                    <p class="section-desc">Fine-tune the installer behavior with PowerShell parameters.</p>
+                </div>
+                <table class="params-table animate-on-scroll">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>-DryRun</td>
+                            <td>Simulate the installation without deleting, installing, or writing anything. Safe to preview.</td>
+                        </tr>
+                        <tr>
+                            <td>-Force</td>
+                            <td>Skip the confirmation prompts. Runs unattended (except API key prompts).</td>
+                        </tr>
+                        <tr>
+                            <td>-SkipClean</td>
+                            <td>Do not delete existing OpenCode config directories. Re-deploy only your configuration.</td>
+                        </tr>
+                        <tr>
+                            <td>-Offline</td>
+                            <td>Use only the local config/ folder. Do not download anything from GitHub.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="code-block" style="margin-top: 24px;">
+                    <span class="code-label">Example</span>
+                    powershell -ExecutionPolicy Bypass -File install.ps1 -DryRun<br>
+                    powershell -ExecutionPolicy Bypass -File install.ps1 -Force<br>
+                    powershell -ExecutionPolicy Bypass -File install.ps1 -SkipClean
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-box animate-on-scroll">
+                <h2>Ready to Upgrade Your<br><span class="gradient-text">OpenCode Experience?</span></h2>
+                <p>One installer. Professional configuration. Zero manual setup.</p>
+                <div class="hero-actions">
+                    <a href="https://github.com/FrancescoCastaldi/opencode-pro-setup/releases" class="btn btn-primary">
+                        &#x2B07; Download install.exe
+                    </a>
+                    <a href="https://github.com/FrancescoCastaldi/opencode-pro-setup" class="btn btn-secondary">
+                        View Repository &#x2197;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="https://github.com/FrancescoCastaldi/opencode-pro-setup">GitHub Repository</a>
+                    <a href="https://github.com/FrancescoCastaldi/opencode-pro-setup/blob/main/README.md">Documentation</a>
+                    <a href="https://github.com/FrancescoCastaldi/opencode-pro-setup/blob/main/docs/API_KEYS.md">API Keys Guide</a>
+                    <a href="https://github.com/FrancescoCastaldi/opencode-pro-setup/blob/main/docs/CUSTOMIZATION.md">Customization</a>
+                    <a href="https://opencode.ai">OpenCode</a>
+                </div>
+                <p class="footer-copy">OpenCode PRO Setup &middot; MIT License &middot; Built for developers who ship.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll Animation Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            document.querySelectorAll('.animate-on-scroll').forEach(function(el) {
+                observer.observe(el);
+            });
+
+            // Close mobile nav on link click
+            document.querySelectorAll('.nav-links a').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    document.getElementById('navLinks').classList.remove('open');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
