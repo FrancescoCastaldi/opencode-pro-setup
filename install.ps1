@@ -39,7 +39,7 @@ param(
 # ============================================================
 # AUTO-ELEVATION
 # ============================================================
-if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+if (-not $DryRun -and -not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Host "  [INFO] Requesting administrator privileges..." -ForegroundColor Cyan
     $argList = @()
     if ($DryRun) { $argList += "-DryRun" }
@@ -47,7 +47,8 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
     if ($SkipClean) { $argList += "-SkipClean" }
     if ($Offline) { $argList += "-Offline" }
     if ($RepoUrl -ne "https://github.com/FrancescoCastaldi/opencode-pro-setup") { $argList += "-RepoUrl `"$RepoUrl`"" }
-    Start-Process powershell -Verb runAs -ArgumentList @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "`"$PSCommandPath`"") + $argList
+    $startArgs = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "`"$PSCommandPath`"") + $argList
+    Start-Process powershell -Verb runAs -ArgumentList $startArgs
     exit
 }
 
