@@ -1,0 +1,8 @@
+.tmp-active-config/
+node_modules/
+*.log
+.env
+.github-token
+*.key
+.DS_Store
+Thumbs.db

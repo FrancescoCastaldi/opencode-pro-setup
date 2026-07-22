@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "https://opencode.ai/config.json",
   "username": "FrancescoCastaldi",
 
@@ -7,9 +7,10 @@
   // ==========================================
   "default_agent": "orchestrator",
   "model": "opencode/deepseek-v4-flash-free",
+  // "small_model": "opencode-go/*",
 
   // ==========================================
-  // SKILLS — percorsi per SKILL.md
+  // SKILLS - percorsi per SKILL.md
   // ==========================================
   "skills": {
     "paths": [
@@ -19,7 +20,7 @@
   },
 
   // ==========================================
-  // REFERENCES — documentazione esterna
+  // REFERENCES - documentazione esterna
   // ==========================================
   "references": {
     "react": {
@@ -40,7 +41,7 @@
   },
 
   // ==========================================
-  // AGENTS — definizione agenti
+  // AGENTS - definizione agenti
   // ==========================================
   "agent": {
     "title": {
@@ -113,7 +114,7 @@
       }
     },
     "reviewer": {
-      "description": "Revisore del codice — analisi qualità, sicurezza e best practices",
+      "description": "Revisore del codice - analisi qualita, sicurezza e best practices",
       "mode": "subagent",
       "color": "#f43f5e",
       "prompt": "{file:~/.config/opencode/agents/reviewer.md}",
@@ -124,7 +125,7 @@
       }
     },
     "debugger": {
-      "description": "Agente specializzato in debugging — trova e risolve bug",
+      "description": "Agente specializzato in debugging - trova e risolve bug",
       "mode": "subagent",
       "color": "#ef4444",
       "prompt": "{file:~/.config/opencode/agents/debugger.md}",
@@ -135,7 +136,7 @@
       }
     },
     "optimizer": {
-      "description": "Agente di ottimizzazione performance — codice + infrastruttura",
+      "description": "Agente di ottimizzazione performance - codice + infrastruttura",
       "mode": "subagent",
       "color": "#10b981",
       "prompt": "{file:~/.config/opencode/agents/optimizer.md}",
@@ -146,7 +147,7 @@
       }
     },
     "tester": {
-      "description": "Agente di test — scrive, esegue e mantiene test",
+      "description": "Agente di test - scrive, esegue e mantiene test",
       "mode": "subagent",
       "color": "#8b5cf6",
       "prompt": "{file:~/.config/opencode/agents/tester.md}",
@@ -157,7 +158,7 @@
       }
     },
     "docker": {
-      "description": "Agente DevOps/Docker — container, compose, CI/CD, deploy",
+      "description": "Agente DevOps/Docker - container, compose, CI/CD, deploy",
       "mode": "subagent",
       "color": "#0ea5e9",
       "prompt": "{file:~/.config/opencode/agents/docker.md}",
@@ -168,7 +169,7 @@
       }
     },
     "database": {
-      "description": "Agente database — SQL, SQLite, PostgreSQL, ottimizzazione query",
+      "description": "Agente database - SQL, SQLite, PostgreSQL, ottimizzazione query",
       "mode": "subagent",
       "color": "#14b8a6",
       "prompt": "{file:~/.config/opencode/agents/database.md}",
@@ -179,7 +180,7 @@
       }
     },
     "refactor": {
-      "description": "Agente di refactoring — ristruttura codice senza cambiarne il comportamento",
+      "description": "Agente di refactoring - ristruttura codice senza cambiarne il comportamento",
       "mode": "subagent",
       "color": "#f97316",
       "prompt": "{file:~/.config/opencode/agents/refactor.md}",
@@ -190,7 +191,7 @@
       }
     },
     "scriptwriter": {
-      "description": "Agente per scripting — PowerShell, bash, Python automation",
+      "description": "Agente per scripting - PowerShell, bash, Python automation",
       "mode": "subagent",
       "color": "#eab308",
       "prompt": "{file:~/.config/opencode/agents/scriptwriter.md}",
@@ -203,17 +204,17 @@
   },
 
   // ==========================================
-  // MCP SERVERS
+  // MCP SERVERS - globally installed packages
   // ==========================================
   "mcp": {
     "filesystem": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-filesystem", "%USERPROFILE%"],
+      "command": ["npx", "-y", "@modelcontextprotocol/server-filesystem", "{env:USERPROFILE}"],
       "enabled": true
     },
     "playwright": {
       "type": "local",
-      "command": ["npx", "-y", "@playwright/mcp@latest"],
+      "command": ["npx", "-y", "@playwright/mcp"],
       "enabled": true
     },
     "github": {
@@ -231,7 +232,7 @@
     },
     "excel": {
       "type": "local",
-      "command": ["cmd", "/c", "npx", "--yes", "@negokaz/excel-mcp-server"],
+      "command": ["npx", "-y", "@negokaz/excel-mcp-server"],
       "enabled": true,
       "env": {
         "EXCEL_MCP_PAGING_CELLS_LIMIT": "4000"
@@ -244,7 +245,7 @@
     },
     "sqlite": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-sqlite", "%USERPROFILE%\\data\\sqlite.db"],
+      "command": ["npx", "-y", "@modelcontextprotocol/server-sqlite", "{env:USERPROFILE}\\data\\sqlite.db"],
       "enabled": false
     },
     "postgres": {
@@ -298,7 +299,7 @@
   },
 
   // ==========================================
-  // LSP SERVERS — Language support
+  // LSP SERVERS - Language support
   // ==========================================
   "lsp": {
     "typescript": {
@@ -325,9 +326,15 @@
       "command": ["vscode-markdown-language-server", "--stdio"],
       "extensions": [".md", ".mdx"]
     },
+    "yaml": {
+      "command": ["yaml-language-server", "--stdio"],
+      "extensions": [".yaml", ".yml"],
+      "enabled": true
+    },
     "latex": {
       "command": ["texlab"],
-      "extensions": [".tex", ".sty", ".cls", ".bib"]
+      "extensions": [".tex", ".sty", ".cls", ".bib"],
+      "enabled": false
     },
     "python": {
       "command": ["pyright-langserver", "--stdio"],
@@ -337,11 +344,6 @@
     "docker": {
       "command": ["dockerfile-language-server-nodejs", "--stdio"],
       "extensions": ["Dockerfile", ".dockerfile"],
-      "enabled": false
-    },
-    "yaml": {
-      "command": ["yaml-language-server", "--stdio"],
-      "extensions": [".yaml", ".yml"],
       "enabled": false
     }
   },

@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-07-22T07:01:39.151Z",
+  "skills": {
+    "simplify": {
+      "status": "customized",
+      "packageVersion": "2.1.1",
+      "sourceHash": "0c925d40c9be99f47701bf1993ae865c6f498f75981849f69840105e10c60f2c",
+      "lastManagedHash": "",
+      "lastSeenHash": "98eb77b25f6badae5ab865a7581381be65dc81088590cc72f57658a2f212691d",
+      "stagedPath": "C:\\Users\\franc\\.config\\opencode\\.oh-my-opencode-slim\\skill-updates\\2.1.1\\simplify",
+      "updatedAt": "2026-07-22T07:01:38.951Z"
+    },
+    "codemap": {
+      "status": "customized",
+      "packageVersion": "2.1.1",
+      "sourceHash": "5e3dbaf448d6aae4af1460df8a6f50431047e7a7158268b0e4327aff716deb66",
+      "lastManagedHash": "",
+      "lastSeenHash": "be5c9324b9984391c62754d8eb76fc92075f6b75933a37e700c009b73817d5db",
+      "stagedPath": "C:\\Users\\franc\\.config\\opencode\\.oh-my-opencode-slim\\skill-updates\\2.1.1\\codemap",
+      "updatedAt": "2026-07-22T07:01:39.054Z"
+    },
+    "clonedeps": {
+      "status": "customized",
+      "packageVersion": "2.2.0",
+      "sourceHash": "372a5ef38968adcc5c61c0e05599bf1acd8d337c4fd7d1bec1b3a2f850897eda",
+      "lastManagedHash": "",
+      "lastSeenHash": "f5f534708d9d6f38345c4d51df695f2ee7e169da380b9e8bda15aad395c5f802",
+      "stagedPath": "C:\\Users\\franc\\.config\\opencode\\.oh-my-opencode-slim\\skill-updates\\2.2.0\\clonedeps",
+      "updatedAt": "2026-07-22T07:01:39.101Z"
+    },
+    "deepwork": {
+      "status": "customized",
+      "packageVersion": "2.2.4",
+      "sourceHash": "696c8cd826274112974e17d5173a3c3ae7d0907624d597b2184e63e2cbbd4960",
+      "lastManagedHash": "",
+      "lastSeenHash": "625f2d91cf2d3edce073a91855d47b92d48a0869dd5687797744150f7286895d",
+      "stagedPath": "C:\\Users\\franc\\.config\\opencode\\.oh-my-opencode-slim\\skill-updates\\2.2.4\\deepwork",
+      "updatedAt": "2026-07-22T07:01:39.115Z"
+    },
+    "reflect": {
+      "status": "customized",
+      "packageVersion": "2.1.1",
+      "sourceHash": "fff44bf253ff0ee4b89561859dc093c17ecef448a28ec8a9624eb69a95da3efc",
+      "lastManagedHash": "",
+      "lastSeenHash": "15ca048376f20e6c3b472cd743c21af3fa6a08d271c085882e961fc06e43c1b0",
+      "stagedPath": "C:\\Users\\franc\\.config\\opencode\\.oh-my-opencode-slim\\skill-updates\\2.1.1\\reflect",
+      "updatedAt": "2026-07-22T07:01:39.127Z"
+    },
+    "oh-my-opencode-slim": {
+      "status": "managed",
+      "packageVersion": "2.2.6",
+      "sourceHash": "d9d143babb02849e7f099a4e31f9cdf1eb09aae4cbc44ac6050859a919e2e00e",
+      "lastManagedHash": "d9d143babb02849e7f099a4e31f9cdf1eb09aae4cbc44ac6050859a919e2e00e",
+      "lastSeenHash": "d9d143babb02849e7f099a4e31f9cdf1eb09aae4cbc44ac6050859a919e2e00e",
+      "updatedAt": "2026-07-22T07:01:39.142Z"
+    },
+    "release-smoke-test": {
+      "status": "managed",
+      "packageVersion": "2.2.0",
+      "sourceHash": "6dafc30ec64a352e482f7e2220d171ab0a834ce5d26e086dc0edb17b3a3a3eeb",
+      "lastManagedHash": "6dafc30ec64a352e482f7e2220d171ab0a834ce5d26e086dc0edb17b3a3a3eeb",
+      "lastSeenHash": "6dafc30ec64a352e482f7e2220d171ab0a834ce5d26e086dc0edb17b3a3a3eeb",
+      "updatedAt": "2026-07-15T11:37:15.865Z"
+    },
+    "worktrees": {
+      "status": "customized",
+      "packageVersion": "2.2.0",
+      "sourceHash": "c865b42c97a0e40c48c7b33f7b92a5679ba0055d3beed0d2a5dbc6d0179ae7a7",
+      "lastManagedHash": "",
+      "lastSeenHash": "08e48c3bcb8be7478ef2cb3ad8a2f310a2938b149fe6a3a3d8dbc2bd14344080",
+      "stagedPath": "C:\\Users\\franc\\.config\\opencode\\.oh-my-opencode-slim\\skill-updates\\2.2.0\\worktrees",
+      "updatedAt": "2026-07-22T07:01:39.151Z"
+    },
+    "verification-planning": {
+      "status": "managed",
+      "packageVersion": "2.2.6",
+      "sourceHash": "d07bfea749cd0a2abb79b192517b483ba0960e08191fad8d2bc5ecc563a15ac8",
+      "lastManagedHash": "d07bfea749cd0a2abb79b192517b483ba0960e08191fad8d2bc5ecc563a15ac8",
+      "lastSeenHash": "d07bfea749cd0a2abb79b192517b483ba0960e08191fad8d2bc5ecc563a15ac8",
+      "updatedAt": "2026-07-22T07:01:39.117Z"
+    }
+  }
+}

@@ -2,333 +2,188 @@
 
 <div align="center">
 
-**Configurazione professionale completa per OpenCode AI editor**
-Plugin, skill, MCP server, agenti multi-orchestrazione e LSP.
+**Professional, batteries-included configuration for the OpenCode AI editor.**
 
-[![Windows](https://img.shields.io/badge/Windows-Supported-blue)](setup.ps1)
-[![macOS](https://img.shields.io/badge/macOS-Supported-blue)](setup.sh)
-[![Linux](https://img.shields.io/badge/Linux-Supported-blue)](setup.sh)
+Plugins, skills, MCP servers, multi-agent orchestration and LSP support.
+
+[![Windows](https://img.shields.io/badge/Windows-Supported-blue)](install.ps1)
 [![OpenCode](https://img.shields.io/badge/OpenCode-1.17%2B-orange)](https://opencode.ai)
 
 </div>
 
 ---
 
-## Indice
+## Quick start
 
-- [Installazione Windows (procedura esatta)](#installazione-windows-procedura-esatta)
-- [Installazione macOS / Linux (procedura esatta)](#installazione-macos--linux-procedura-esatta)
-- [Cosa fa l'installer, passo per passo](#cosa-fa-linstaller-passo-per-passo)
-- [API keys: cosa serve e dove trovarle](#api-keys-cosa-serve-e-dove-trovarle)
-- [Dopo l'installazione: primo avvio](#dopo-linstallazione-primo-avvio)
-- [Parametri dell'installer](#parametri-dellinstaller)
-- [Cosa include](#cosa-include)
-- [Personalizzazione](#personalizzazione)
-
----
-
-## Installazione Windows (procedura esatta)
-
-### Prerequisiti
-
-- Windows 10+ con PowerShell 5.0+
-- L'installer **può installare automaticamente** Node.js e Git se mancanti
-
-### Procedura
-
-#### 1. Apri PowerShell come Amministratore
-
-Premi `Win+X`, seleziona **"Windows PowerShell (Admin)"** oppure **"Terminale (Admin)"**.
-
-#### 2. Esegui questo comando (copia e incolla tutto)
+1. **Clone or download this repository.**
+2. **Open PowerShell as Administrator** in the folder.
+3. Run the installer:
 
 ```powershell
-powershell -Command "iwr -Uri 'https://raw.githubusercontent.com/FrancescoCastaldi/opencode-pro-setup/main/setup.ps1' -OutFile \"$env:TEMP\setup.ps1\"; powershell -ExecutionPolicy Bypass -File \"$env:TEMP\setup.ps1\""
+powershell -ExecutionPolicy Bypass -File install.ps1
 ```
 
-> **Nota:** Windows potrebbe chiedere conferma per eseguire script non firmati. Rispondi **Sì** o **Esegui comunque**.
+Or simply **double-click `install.bat`**. It will request administrator rights automatically and run `install.ps1` for you.
 
-#### 3. Segui le richieste interattive
-
-L'installer ti chiederà:
-
-| Prompt | Cosa rispondere |
-|--------|----------------|
-| "Install Node.js LTS via winget?" | `Y` (se non hai Node.js) |
-| "Install Git via winget?" | `Y` (se non hai Git) |
-| "Clean all existing installations?" | `Y` (consigliato per installazione pulita) |
-| "Enter GitHub Personal Access Token" | Inserisci il tuo token (vedi [API keys](#api-keys-cosa-serve-e-dove-trovarle)) oppure Invio per saltare |
-| "Enter OpenCode username" | Invio per usare il nome utente Windows, oppure digita un nome personalizzato |
-
-#### 4. Verifica il risultato finale
-
-Se tutto è ok, vedrai:
-
-```
-========================================
- OpenCode PRO - Installation Complete!
-========================================
-    OpenCode CLI: v1.xx.x
-    Config: opencode.jsonc
-    Agent: orchestrator
-    Custom plugins: 3
-    Skills: 6
-    Plugin deps: installed
-    ...
-    Run: opencode
-```
-
-#### 5 (opzionale) — Installa manualmente se la via diretta non funziona
-
-```powershell
-git clone https://github.com/FrancescoCastaldi/opencode-pro-setup.git
-cd opencode-pro-setup
-powershell -ExecutionPolicy Bypass -File setup.ps1
-```
+> **No backup is created.** The installer deletes the existing OpenCode config/data directories and installs a fresh PRO setup.
 
 ---
 
-## Installazione macOS / Linux (procedura esatta)
+## What the installer does
 
-### Prerequisiti
-
-- Node.js 18+ e npm
-- Git
-- Bash o Zsh
-
-### Procedura
-
-```bash
-# 1. Clona il repository
-git clone https://github.com/FrancescoCastaldi/opencode-pro-setup.git
-cd opencode-pro-setup
-
-# 2. Rendi eseguibile lo script
-chmod +x setup.sh
-
-# 3. Esegui l'installer
-./setup.sh
-```
-
-Lo script bash segue la stessa pipeline dello script Windows.
+| Step | Action |
+|------|--------|
+| **0. Prerequisites** | Verifies Node.js and npm. If Node.js is missing, it can install it via `winget`. |
+| **1. Clean** | Deletes existing `~/.config/opencode`, `~/.opencode`, `~/.opencode-mem` and uninstalls `opencode-ai` globally. |
+| **2. Install OpenCode** | `npm install -g --no-fund --no-audit opencode-ai@latest` |
+| **3. Deploy config** | Copies `config/` from this repo to `~/.config/opencode`. |
+| **4. Plugin dependencies** | Runs `npm install --no-fund --no-audit` inside the config directory. |
+| **5. MCP servers** | Installs MCP servers globally (filesystem, playwright, github, puppeteer, excel, opencode, fetch, sequential-thinking, memory). |
+| **6. LSP servers** | Installs TypeScript/HTML/CSS/JSON/Markdown/YAML language servers globally. |
+| **7. API keys** | Prompts for **OpenCode Zen**, **OpenCode Go** and **GitHub** API keys. |
+| **8. Providers** | Adds `opencode` and `opencode-go` providers if not already present. |
+| **9. Verify** | Checks `opencode --version`, config, plugins, skills and dependencies. |
 
 ---
 
-## Cosa fa l'installer, passo per passo
+## API keys
 
-### Pipeline completa
+The installer will ask for the following keys:
 
-```
-Prerequisiti → Scansione & Backup → Pulizia → Installa OpenCode → 
-Crea directory → Deploy config → Plugin deps → MCP & LSP → 
-API Keys → Provider → Verifica
-```
+| Key | Why it is needed | Where to get it |
+|-----|------------------|-----------------|
+| **OpenCode Zen API key** | Authenticates the `opencode` provider. | Your OpenCode account dashboard. |
+| **OpenCode Go API key** | Authenticates the `opencode-go` provider. | Your OpenCode Go account dashboard. |
+| **GitHub Personal Access Token** | Powers the GitHub MCP server and code search. | https://github.com/settings/tokens - create a classic token with `repo` and `read:user` scopes. |
 
-### Dettaglio step
+Keys are stored in:
 
-| Step | Cosa fa | Richiede input? |
-|------|---------|----------------|
-| **0. Prerequisiti** | Verifica Node.js 18+, npm, Git. Li installa via winget se assenti | Solo se mancano e vuoi installarli |
-| **1. Scansione & Backup** | Cerca installazioni OpenCode esistenti, le backup in `~/opencode-backup-*` | Chiede conferma prima di pulire |
-| **2. Installa OpenCode** | `npm install -g opencode-ai@latest` | No |
-| **3. Crea directory** | Crea `~/.config/opencode/` con sottocartelle `agents/`, `plugins/`, `skills/`, `snippet/`, `memory/` | No |
-| **4. Deploy config** | Copia `opencode.jsonc`, agenti, plugin custom, memory, skills, snippet dal repo o da GitHub | No |
-| **5. Plugin dependencies** | `npm install` nella cartella config (plugin: opencode-snippets, supermemory, background-agents, worktree, notify, oh-my-opencode-slim) | No |
-| **5b. MCP & LSP** | Installa globalmente MCP server (playwright, github, excel, sequential-thinking, memory, fetch) e LSP (TypeScript, HTML, CSS, JSON, Markdown, YAML) | No |
-| **5c. API Keys** | Configura GitHub Token e username | **Sì** — chiede GitHub Token |
-| **5d. Providers** | Configura provider `opencode` e `opencode-go` | No |
-| **6. Verifica** | Controlla CLI, config, agenti, plugin, skills, node_modules | No |
+- `~/.config/opencode/.env` (for OpenCode CLI/environment)
+- `~/.config/opencode/.github-token` (for the GitHub MCP server)
+- Your user-level environment variables (`OPENCODE_API_KEY`, `OPENCODE_GO_API_KEY`, `GITHUB_TOKEN`)
+
+You can re-run the installer at any time to rotate the keys.
 
 ---
 
-## API keys: cosa serve e dove trovarle
+## Installer parameters
 
-### Obbligatorie
-
-Nessuna — puoi saltare tutto e iniziare subito con `opencode`.
-
-### Consigliate
-
-| Chiave | Dove trovarla | Cosa abilita |
-|--------|--------------|--------------|
-| **GitHub Token** | https://github.com/settings/tokens → `Generate new token (classic)` → spunta `repo` e `user` | Ricerca codice GitHub (gh_grep) |
-| **GitHub Username** | Il tuo username GitHub | Identificazione nei commit |
-
-### Opzionali (configurabili dopo)
-
-| Chiave | Dove configurarla | Cosa abilita |
-|--------|------------------|--------------|
-| **Anthropic API Key** | `opencode providers add anthropic` | Modelli Claude |
-| **OpenRouter API Key** | `opencode providers add openrouter` | Molteplici modelli |
-| **Google AI Key** | `opencode providers add google` | Modelli Gemini |
-| **OpenAI Key** | `opencode providers add openai` | Modelli GPT |
-
----
-
-## Dopo l'installazione: primo avvio
-
-### 1. Avvia OpenCode
-
-```bash
-opencode
-```
-
-Al primo avvio OpenCode crea il database interno e inizializza i plugin.
-
-### 2. In un progetto esistente
-
-Naviga nella cartella del progetto e apri OpenCode:
-
-```bash
-cd C:\Progetti\mio-progetto
-opencode
-```
-
-Oppure usa `/init` dentro OpenCode per analizzare il progetto.
-
-### 3. Verifica i plugin attivi
-
-Dentro OpenCode, controlla che i plugin siano caricati:
-
-```
-/plugin list
-```
-
-Dovresti vedere: opencode-snippets, supermemory, background-agents, worktree, notify, oh-my-opencode-slim, context-pruning, env-protection, notification.
-
-### 4. Configura provider aggiuntivi (opzionale)
-
-```bash
-opencode providers add anthropic
-opencode providers add openrouter
-# Segui le istruzioni interattive per inserire le API key
-```
-
-### 5. Se qualcosa non funziona
-
-```bash
-# Riavvio pulito
-opencode
-# Se persiste, reinstalla
-npm uninstall -g opencode-ai && npm install -g opencode-ai
-```
-
----
-
-## Parametri dell'installer
-
-| Parametro | Descrizione |
+| Parameter | Description |
 |-----------|-------------|
-| `-Force` | Esecuzione automatica (non chiede conferme) |
-| `-SkipClean` | Salta backup e pulizia installazioni esistenti |
-| `-Offline` | Usa solo file locali (non scarica da GitHub) |
-| `-RepoUrl` | URL del repository (default: GitHub) |
+| `-DryRun` | Simulate the installation without deleting, installing or writing anything. |
+| `-Force` | Skip the confirmation prompts before cleaning and installing. |
+| `-SkipClean` | Do not delete existing OpenCode directories. |
+| `-Offline` | Use only the local `config/` folder, do not download from GitHub. |
 
-### Esempi
+### Examples
 
 ```powershell
-# Installazione automatica (senza interruzioni)
-powershell -ExecutionPolicy Bypass -File setup.ps1 -Force
+# See what the installer would do
+powershell -ExecutionPolicy Bypass -File install.ps1 -DryRun
 
-# Solo deploy configurazione (senza pulire)
-powershell -ExecutionPolicy Bypass -File setup.ps1 -SkipClean
+# Fully unattended (except API-key prompts)
+powershell -ExecutionPolicy Bypass -File install.ps1 -Force
 
-# Installazione offline
-powershell -ExecutionPolicy Bypass -File setup.ps1 -Offline
+# Re-deploy only the configuration without deleting anything
+powershell -ExecutionPolicy Bypass -File install.ps1 -SkipClean
 ```
 
 ---
 
-## Cosa include
+## What's included
 
-### Agenti (13)
+### Agents
 
-| Agente | Ruolo |
-|--------|-------|
-| **orchestrator** | Coordinatore multi-agente — pianifica, delega, verifica |
-| **general** | Assistente generico per coding |
-| **explorer** | Ricerca rapida nel codebase |
-| **brainstormer** | Ideazione e progettazione |
-| **build** | Implementazione esecutiva |
-| **reviewer** | Code review qualità e sicurezza |
-| **debugger** | Debug sistematico |
-| **optimizer** | Ottimizzazione performance |
-| **tester** | Test automation |
-| **docker** | DevOps e container |
-| **database** | SQL e query optimization |
-| **refactor** | Refactoring strutturale |
-| **scriptwriter** | Automazione scripting |
+13 agents including orchestrator, general, explore, brainstormer, build, reviewer, debugger, optimizer, tester, docker, database, refactor and scriptwriter.
 
-### Plugin
+### Plugins
 
-- **Ufficiali:** opencode-snippets, supermemory, background-agents, worktree, notify, oh-my-opencode-slim, opencode-mem
-- **Custom:** context-pruning (comprime contesto), env-protection (protegge .env), notification (notifiche cross-platform)
+- **Official:** `opencode-mem`, `opencode-snippets`, `opencode-supermemory`, `opencode-background-agents`, `opencode-worktree`, `opencode-notify`, `oh-my-opencode-slim`
+- **Custom:** `context-pruning`, `env-protection`, `notification`
 
-### Skill
+### Skills
 
-deepwork, simplify, codemap, clonedeps, reflect, worktrees
+`deepwork`, `simplify`, `codemap`, `clonedeps`, `reflect`, `worktrees`, `release-smoke-test`, `repo-scaffold`, `verification-planning` plus `oh-my-opencode-slim` skill updates.
 
-### MCP Server
+### MCP servers
 
-| Server | Descrizione |
-|--------|-------------|
-| `@playwright/mcp` | Automazione browser |
-| `@modelcontextprotocol/server-github` | API GitHub |
-| `@negokaz/excel-mcp-server` | Operazioni Excel |
-| `opencode-mcp` | Comandi OpenCode |
-| `mcp-fetch-server` | Fetch URL |
-| `@modelcontextprotocol/server-sequential-thinking` | Ragionamento strutturato |
-| `@modelcontextprotocol/server-memory` | Memoria persistente |
-| `context7` / `gh_grep` (plugin) | Documentazione e ricerca codice |
+| Server | Package | Status |
+|--------|---------|--------|
+| filesystem | `@modelcontextprotocol/server-filesystem` | enabled |
+| playwright | `@playwright/mcp` | enabled |
+| github | `@modelcontextprotocol/server-github` | enabled |
+| puppeteer | `@modelcontextprotocol/server-puppeteer` | enabled |
+| excel | `@negokaz/excel-mcp-server` | enabled |
+| opencode | `opencode-mcp` | enabled |
+| fetch | `html-extractor-mcp` | enabled |
+| sequential-thinking | `@modelcontextprotocol/server-sequential-thinking` | enabled |
+| memory | `@modelcontextprotocol/server-memory` | enabled |
+| context7 | remote | enabled |
+| gh_grep | remote | enabled |
+| sqlite, postgres, redis, brave-search, mcp-ops | - | disabled |
 
-### LSP Server
+### LSP servers
 
-TypeScript, JavaScript, HTML, CSS, JSON, Markdown, YAML
+TypeScript, JavaScript, HTML, CSS, JSON, Markdown, YAML.
 
 ---
 
-## Personalizzazione
+## Customization
 
-Modifica `config/opencode.jsonc` per:
-
-- **Cambiare modello AI predefinito** — modifica `"model"` nella sezione del provider
-- **Aggiungere/rimuovere plugin** — aggiorna `"plugins"` nella sezione `"pluginDependencies"`
-- **Aggiungere/rimuovere MCP server** — modifica la sezione `"mcpServers"`
-- **Configurare permessi** — modifica la sezione `"permissions"`
-- **Aggiungere LSP server** — modifica la sezione `"lsp"`
-
-Dopo aver modificato il config, esegui:
-
-```bash
-opencode
-```
-
-OpenCode rilegge automaticamente il config all'avvio.
+Edit `~/.config/opencode/opencode.jsonc` to change models, plugins, MCP servers, permissions or LSP servers. OpenCode reads the configuration automatically on the next start.
 
 ---
 
-## Struttura del Repository
+## Repository structure
 
 ```
 opencode-pro-setup/
-├── setup.ps1               # [Windows] Installer PowerShell (self-contained)
-├── setup.sh                # [macOS/Linux] Installer Bash
-├── README.md               # Questa guida
-├── ARCHITECTURE.md         # Architettura del setup
-├── config/
-│   ├── opencode.jsonc      # Config principale OpenCode (versione PRO)
-│   ├── oh-my-opencode-slim.json  # OMO preset con agenti
-│   ├── opencode-mem.jsonc  # Memoria plugin config
-│   ├── dcp.jsonc           # Dynamic Context Pruning
-│   ├── tui.json            # TUI plugin config
-│   ├── .env.example        # Template API keys
-│   ├── .gitignore
-│   ├── agents/             # Agenti AI (orchestrator, ecc.)
-│   ├── plugins/            # Plugin custom (context-pruning, env-protection, notification)
-│   ├── snippet/            # Config snippet
-│   ├── memory/             # Memoria persistente (human.md, persona.md)
-│   └── skills/             # Skill (deepwork, simplify, codemap, clonedeps, reflect, worktrees)
-└── docs/
-    ├── API_KEYS.md
-    └── CUSTOMIZATION.md
+├── install.ps1          # Single PowerShell installer
+├── install.bat          # Double-click wrapper for install.ps1
+├── README.md            # This file
+├── ARCHITECTURE.md      # Architecture notes
+├── docs/                # Additional documentation
+└── config/              # OpenCode PRO configuration
+    ├── opencode.jsonc   # Main config
+    ├── opencode-mem.jsonc
+    ├── oh-my-opencode-slim.json
+    ├── dcp.jsonc
+    ├── tui.json
+    ├── .env.example     # Template for API keys
+    ├── .gitignore
+    ├── package.json     # Plugin dependencies
+    ├── agents/
+    ├── commands/
+    ├── memory/
+    ├── plugins/
+    ├── skills/
+    └── snippet/
 ```
+
+---
+
+## Troubleshooting
+
+```powershell
+# Re-run the installer
+powershell -ExecutionPolicy Bypass -File install.ps1
+
+# Check what the installer would do
+powershell -ExecutionPolicy Bypass -File install.ps1 -DryRun
+
+# Reinstall the OpenCode CLI only
+npm uninstall -g opencode-ai
+npm install -g opencode-ai
+
+# Reinstall global MCP servers
+npm install -g @modelcontextprotocol/server-filesystem @playwright/mcp @modelcontextprotocol/server-github @modelcontextprotocol/server-puppeteer @negokaz/excel-mcp-server opencode-mcp html-extractor-mcp @modelcontextprotocol/server-sequential-thinking @modelcontextprotocol/server-memory
+
+# Reinstall global LSP servers
+npm install -g typescript-language-server vscode-langservers-extracted yaml-language-server
+```
+
+---
+
+## License
+
+MIT - see the repository for details.

@@ -1,19 +1,18 @@
 @echo off
-title OpenCode PRO - Installer
+setlocal EnableDelayedExpansion
 chcp 65001 >nul
 
 :: ============================================================
-:: OpenCode PRO - Double-Click Installer for Windows
+:: OpenCode PRO - Windows launcher for install.ps1
 :: ============================================================
-:: Basta fare doppio click su questo file per installare
-:: automaticamente OpenCode con configurazione PRO completa.
+:: Right-click this file and select "Run as administrator", or
+:: simply double-click it to auto-elevate.
 :: ============================================================
 
-:: Controlla se siamo in admin, altrimenti auto-eleva
 net session >nul 2>&1
 if %errorLevel% neq 0 (
-    echo [INFO] Richiedo privilegi di amministratore...
-    powershell start-process -FilePath "%~f0" -Verb runAs
+    echo [INFO] Requesting administrator privileges...
+    powershell -Command "Start-Process -FilePath '%~f0' -Verb runAs -ArgumentList '%*'"
     exit /b
 )
 
@@ -22,23 +21,21 @@ cd /d "%~dp0"
 cls
 echo ============================================
 echo    OpenCode PRO - Windows Installer
-echo    Doppio click setup - configurazione PRO
 echo ============================================
 echo.
-echo Installazione in corso... Attendere.
-echo.
 
-:: Lancia il setup PowerShell automatico (senza conferme)
-powershell -ExecutionPolicy Bypass -File "%~dp0setup.ps1" -Force
+:: Pass through any command-line arguments (e.g. -DryRun)
+powershell -ExecutionPolicy Bypass -File "%~dp0install.ps1" %*
+set EXIT_CODE=%errorLevel%
 
 echo.
 echo ============================================
-if %errorLevel% equ 0 (
-    echo Installazione completata con successo!
-    echo Puoi chiudere questa finestra.
+if %EXIT_CODE% equ 0 (
+    echo Installation completed successfully.
 ) else (
-    echo Installazione fallita. Controlla i messaggi sopra.
+    echo Installation failed. Check the messages above.
 )
 echo ============================================
 echo.
 pause
+exit /b %EXIT_CODE%
