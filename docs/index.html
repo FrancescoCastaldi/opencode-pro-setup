@@ -1179,7 +1179,7 @@
             <div class="section-header animate-on-scroll">
                 <div class="section-label">&#x2B07; Installation</div>
                 <h2 class="section-title">Up and Running in Minutes</h2>
-                <p class="section-desc">Four simple steps. The installer handles everything else.</p>
+                <p class="section-desc">Five simple steps. The installer handles everything else.</p>
             </div>
             <div class="install-steps">
                 <div class="install-step animate-on-scroll">
@@ -1208,6 +1208,17 @@
                 <div class="install-step animate-on-scroll">
                     <div class="step-number">3</div>
                     <div class="step-content">
+                        <h3>Choose the Target User</h3>
+                        <p>The installer detects all Windows user profiles on your system. You can select which user to install OpenCode PRO for, or use <code>-TargetUser</code> for automation.</p>
+                        <div class="code-block">
+                            <span class="code-label">Automation</span>
+                            powershell -ExecutionPolicy Bypass -File install.ps1 -TargetUser &lt;username&gt;
+                        </div>
+                    </div>
+                </div>
+                <div class="install-step animate-on-scroll">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
                         <h3>Enter Your API Keys</h3>
                         <p>The installer will prompt for three keys. Have them ready:</p>
                         <div class="code-block">
@@ -1219,7 +1230,7 @@
                     </div>
                 </div>
                 <div class="install-step animate-on-scroll">
-                    <div class="step-number">4</div>
+                    <div class="step-number">5</div>
                     <div class="step-content">
                         <h3>You're Done!</h3>
                         <p>The installer verifies everything — CLI version, config, plugins, skills, and dependencies. Start OpenCode and enjoy your professional setup.</p>
@@ -1257,6 +1268,10 @@
                         <tr>
                             <td>-Offline</td>
                             <td>Use only the local config/ folder. Do not download anything from GitHub.</td>
+                        </tr>
+                        <tr>
+                            <td>-TargetUser</td>
+                            <td>Install for a specific Windows user (e.g. "fracas") without interactive selection. Useful for automation or remote execution.</td>
                         </tr>
                     </tbody>
                 </table>

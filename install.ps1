@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
     OpenCode PRO - Single PowerShell Installer for Windows.
@@ -21,10 +21,12 @@
     Use only the local config/ folder; do not download from GitHub.
 .PARAMETER RepoUrl
     Repository URL to download config from when running online.
+.PARAMETER TargetUser
+    Specify the target Windows user for installation directly.
 .NOTES
     Author: Francesco Castaldi
     Repo:   https://github.com/FrancescoCastaldi/opencode-pro-setup
-    Version: 3.1.0
+    Version: 3.2.0
     Usage:  powershell -ExecutionPolicy Bypass -File install.ps1
 #>
 
@@ -33,7 +35,8 @@ param(
     [switch]$Force,
     [switch]$SkipClean,
     [switch]$Offline,
-    [string]$RepoUrl = "https://github.com/FrancescoCastaldi/opencode-pro-setup"
+    [string]$RepoUrl = "https://github.com/FrancescoCastaldi/opencode-pro-setup",
+    [string]$TargetUser
 )
 
 # ============================================================
@@ -47,6 +50,7 @@ if (-not $DryRun -and -not ([Security.Principal.WindowsPrincipal][Security.Princ
     if ($SkipClean) { $argList += "-SkipClean" }
     if ($Offline) { $argList += "-Offline" }
     if ($RepoUrl -ne "https://github.com/FrancescoCastaldi/opencode-pro-setup") { $argList += "-RepoUrl `"$RepoUrl`"" }
+    if ($TargetUser) { $argList += "-TargetUser `"$TargetUser`"" }
     $startArgs = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "`"$PSCommandPath`"") + $argList
     Start-Process powershell -Verb runAs -ArgumentList $startArgs
     exit
@@ -58,14 +62,127 @@ $Host.UI.RawUI.WindowTitle = "OpenCode PRO Setup for Windows"
 # ============================================================
 # CONFIGURATION
 # ============================================================
-$CONFIG_DIR       = "$env:USERPROFILE\.config\opencode"
-$OPENCODE_DIR     = "$env:USERPROFILE\.opencode"
-$OPENCODE_MEM_DIR = "$env:USERPROFILE\.opencode-mem"
-$LOCAL_APP_DIR    = "$env:LOCALAPPDATA\opencode"
-$ROAMING_APP_DIR  = "$env:APPDATA\opencode"
+# These will be set by Step-SelectUser based on the chosen user profile
+$script:SELECTED_USER = $null
+$script:SELECTED_USER_PROFILE = $null
+$script:CONFIG_DIR       = $null
+$script:OPENCODE_DIR     = $null
+$script:OPENCODE_MEM_DIR = $null
+$script:LOCAL_APP_DIR    = $null
+$script:ROAMING_APP_DIR  = $null
 $SCRIPT_DIR       = if ($PSCommandPath) { Split-Path -Parent $PSCommandPath } else { Split-Path -Parent ([System.Reflection.Assembly]::GetEntryAssembly().Location) }
 $LOCAL_CONFIG_SRC = Join-Path $SCRIPT_DIR "config"
 $MIN_NODE_MAJOR   = 18
+
+function Get-UserProfilePath {
+    param([string]$UserName)
+    return "C:\Users\$UserName"
+}
+
+function Get-UserAppData {
+    param([string]$UserName)
+    return "C:\Users\$UserName\AppData"
+}
+
+function Initialize-UserPaths {
+    param([string]$UserName)
+    $profile = Get-UserProfilePath -UserName $UserName
+    $appData = Get-UserAppData -UserName $UserName
+    $script:CONFIG_DIR       = Join-Path $profile ".config\opencode"
+    $script:OPENCODE_DIR     = Join-Path $profile ".opencode"
+    $script:OPENCODE_MEM_DIR = Join-Path $profile ".opencode-mem"
+    $script:LOCAL_APP_DIR    = Join-Path $appData "Local\opencode"
+    $script:ROAMING_APP_DIR  = Join-Path $appData "Roaming\opencode"
+    $script:SELECTED_USER_PROFILE = $profile
+}
+
+# ============================================================
+# STEP: SELECT TARGET USER
+# ============================================================
+function Step-SelectUser {
+    Write-Step "STEP - Selecting target user for installation"
+
+    if ($TargetUser) {
+        $profilePath = "C:\Users\$TargetUser"
+        if (-not (Test-Path $profilePath)) {
+            Write-Err "Specified user '$TargetUser' does not exist (profile not found at $profilePath)."
+            exit 1
+        }
+        $script:SELECTED_USER = $TargetUser
+        $script:SELECTED_USER_PROFILE = $profilePath
+        Write-Info "Target user: $TargetUser (specified via -TargetUser)"
+        Initialize-UserPaths -UserName $TargetUser
+        return
+    }
+
+    # Discover available users
+    $users = @()
+    try {
+        $localUsers = Get-LocalUser | Where-Object { $_.Enabled -eq $true }
+        foreach ($u in $localUsers) {
+            $profilePath = "C:\Users\$($u.Name)"
+            if (Test-Path $profilePath) {
+                $configPath = Join-Path $profilePath ".config\opencode"
+                $hasConfig = Test-Path $configPath
+                $users += [PSCustomObject]@{
+                    Name = $u.Name
+                    ProfilePath = $profilePath
+                    HasConfig = $hasConfig
+                }
+            }
+        }
+    } catch {
+        Write-Warn "Could not enumerate local users via Get-LocalUser. Falling back to C:\Users directory."
+        $dirs = Get-ChildItem "C:\Users" -Directory | Where-Object { $_.Name -ne "Public" }
+        foreach ($d in $dirs) {
+            $configPath = Join-Path $d.FullName ".config\opencode"
+            $hasConfig = Test-Path $configPath
+            $users += [PSCustomObject]@{
+                Name = $d.Name
+                ProfilePath = $d.FullName
+                HasConfig = $hasConfig
+            }
+        }
+    }
+
+    if ($users.Count -eq 0) {
+        Write-Err "No user profiles found on this system."
+        exit 1
+    }
+
+    Write-Host ""
+    Write-Host "  Available users:" -ForegroundColor Cyan
+    Write-Host "  ─────────────────────────────────────" -ForegroundColor DarkGray
+    for ($i = 0; $i -lt $users.Count; $i++) {
+        $u = $users[$i]
+        $configLabel = if ($u.HasConfig) { " (has existing config)" } else { "" }
+        Write-Host "  [$($i+1)] $($u.Name)$configLabel" -ForegroundColor White
+    }
+    Write-Host "  [0] Exit" -ForegroundColor DarkGray
+    Write-Host ""
+
+    $selection = -1
+    while ($selection -lt 0 -or $selection -gt $users.Count) {
+        $input = Read-Host "Select user (0 to exit)"
+        if ($input -match '^\d+$') {
+            $selection = [int]$input
+        }
+        if ($selection -lt 0 -or $selection -gt $users.Count) {
+            Write-Warn "Invalid selection. Choose a number between 0 and $($users.Count)."
+        }
+    }
+
+    if ($selection -eq 0) {
+        Write-Info "Installation cancelled by user."
+        exit 0
+    }
+
+    $selectedUser = $users[$selection - 1]
+    $script:SELECTED_USER = $selectedUser.Name
+    $script:SELECTED_USER_PROFILE = $selectedUser.ProfilePath
+    Write-Ok "Selected user: $($selectedUser.Name) ($($selectedUser.ProfilePath))"
+    Initialize-UserPaths -UserName $selectedUser.Name
+}
 
 # ============================================================
 # LOGGING
@@ -680,8 +797,12 @@ try {
     Write-Host ""
 
     $existingDirs = @($CONFIG_DIR, $OPENCODE_DIR, $OPENCODE_MEM_DIR, $LOCAL_APP_DIR, $ROAMING_APP_DIR)
+    # Note: existingDirs will be recalculated after Step-SelectUser sets the paths
 
     Step-Prerequisites
+    Step-SelectUser
+    # Recalculate directories based on selected user
+    $existingDirs = @($CONFIG_DIR, $OPENCODE_DIR, $OPENCODE_MEM_DIR, $LOCAL_APP_DIR, $ROAMING_APP_DIR)
     Step-Clean -ExistingDirs $existingDirs
     Step-InstallOpenCode
     Step-CreateDirectories

@@ -34,6 +34,7 @@ Or simply **double-click `install.bat`**. It will request administrator rights a
 | Step | Action |
 |------|--------|
 | **0. Prerequisites** | Verifies Node.js and npm. If Node.js is missing, it can install it via `winget`. |
+| **0. User selection** | Detects available Windows user profiles and lets you choose which user to install OpenCode PRO for. Use `-TargetUser` to skip the menu. |
 | **1. Clean** | Deletes existing `~/.config/opencode`, `~/.opencode`, `~/.opencode-mem` and uninstalls `opencode-ai` globally. |
 | **2. Install OpenCode** | `npm install -g --no-fund --no-audit opencode-ai@latest` |
 | **3. Deploy config** | Copies `config/` from this repo to `~/.config/opencode`. |
@@ -74,6 +75,7 @@ You can re-run the installer at any time to rotate the keys.
 | `-Force` | Skip the confirmation prompts before cleaning and installing. |
 | `-SkipClean` | Do not delete existing OpenCode directories. |
 | `-Offline` | Use only the local `config/` folder, do not download from GitHub. |
+| `-TargetUser` | Install for a specific Windows user (e.g. `fracas`) without interactive user selection. Useful for automation or remote execution. |
 
 ### Examples
 
@@ -86,6 +88,9 @@ powershell -ExecutionPolicy Bypass -File install.ps1 -Force
 
 # Re-deploy only the configuration without deleting anything
 powershell -ExecutionPolicy Bypass -File install.ps1 -SkipClean
+
+# Install for a specific Windows user (e.g. "fracas")
+powershell -ExecutionPolicy Bypass -File install.ps1 -TargetUser fracas
 ```
 
 ---
