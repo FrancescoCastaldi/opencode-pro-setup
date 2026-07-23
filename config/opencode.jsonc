@@ -243,29 +243,6 @@
       "command": ["npx", "-y", "opencode-mcp"],
       "enabled": true
     },
-    "sqlite": {
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-sqlite", "{env:USERPROFILE}\\data\\sqlite.db"],
-      "enabled": false
-    },
-    "postgres": {
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-postgres", "postgresql://localhost/mydb"],
-      "enabled": false
-    },
-    "redis": {
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-redis", "redis://localhost:6379"],
-      "enabled": false
-    },
-    "brave-search": {
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-brave-search"],
-      "enabled": false,
-      "env": {
-        "BRAVE_API_KEY": "{env:BRAVE_API_KEY}"
-      }
-    },
     "fetch": {
       "type": "local",
       "command": ["npx", "-y", "html-extractor-mcp"],
@@ -280,11 +257,6 @@
       "type": "local",
       "command": ["npx", "-y", "@modelcontextprotocol/server-memory"],
       "enabled": true
-    },
-    "mcp-ops": {
-      "type": "local",
-      "command": ["npx", "-y", "mcp-ops"],
-      "enabled": false
     },
     "context7": {
       "type": "remote",
